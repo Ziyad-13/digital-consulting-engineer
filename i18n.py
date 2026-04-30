@@ -46,6 +46,18 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                            "ar": "لم تُصرف أي دفعات بعد."},
     "nav.certificates":   {"en": "Payment certificates",
                            "ar": "شهادات الدفع"},
+    "nav.delete_project": {"en": "🗑️ Delete this project",
+                           "ar": "🗑️ حذف هذا المشروع"},
+    "nav.confirm_delete": {"en": "Type the project name to confirm:",
+                           "ar": "اكتب اسم المشروع للتأكيد:"},
+    "nav.confirm_delete_btn": {"en": "Confirm permanent deletion",
+                               "ar": "تأكيد الحذف النهائي"},
+    "nav.delete_warning": {"en": "⚠️ This permanently deletes the project and all its checklists, photos, and payment records.",
+                           "ar": "⚠️ هذا يحذف المشروع نهائياً مع جميع البنود والصور وسجلات الدفع."},
+    "nav.deleted":        {"en": "Project deleted.",
+                           "ar": "تم حذف المشروع."},
+    "nav.name_mismatch":  {"en": "The name you typed doesn't match. Deletion cancelled for safety.",
+                           "ar": "الاسم المُدخل لا يطابق اسم المشروع. تم إلغاء الحذف للسلامة."},
 
     # ----- Header / progress -----
     "hdr.budget":      {"en": "Budget (SAR)", "ar": "الميزانية (ر.س)"},
