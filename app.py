@@ -137,6 +137,36 @@ with st.sidebar:
                     f"{c['amount']:,.0f} SAR ({c['percentage']:.0f}%)"
                 )
 
+        # ---- Danger zone: delete project -------------------------------
+        # Hidden inside an expander + requires typing the project name as a
+        # confirmation, since deletion is permanent and cascades to every
+        # child table.
+        st.markdown("---")
+        with st.expander(t("nav.delete_project")):
+            project_name = next(
+                (p["name"] for p in projects if p["id"] == selected_id), ""
+            )
+            st.caption(t("nav.delete_warning"))
+            typed = st.text_input(
+                t("nav.confirm_delete"),
+                key=f"delete_confirm_{selected_id}",
+                placeholder=project_name,
+            )
+            if st.button(t("nav.confirm_delete_btn"),
+                         key=f"delete_btn_{selected_id}",
+                         type="secondary",
+                         use_container_width=True):
+                if typed.strip() == project_name:
+                    db.delete_project(selected_id)
+                    # Clear the active selection so the welcome screen
+                    # appears (or the next project is auto-selected).
+                    if "active_project_id" in st.session_state:
+                        del st.session_state["active_project_id"]
+                    st.success(t("nav.deleted"))
+                    st.rerun()
+                else:
+                    st.error(t("nav.name_mismatch"))
+
 
 # ---------------------------------------------------------------------------
 # Main area
