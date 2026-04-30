@@ -1,0 +1,9 @@
+streamlit>=1.32
+
+# Optional, for production AI integration:
+# anthropic           # Claude vision + RAG over Saudi Building Code
+# pdfplumber          # PDF text/table extraction
+# pymupdf             # Fast PDF rendering
+# ultralytics         # YOLOv8 for rebar / defect detection
+# qdrant-client       # Vector DB for SBC RAG
+# reportlab           # Real PDF generation for certificates & snag reports
