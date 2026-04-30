@@ -222,6 +222,21 @@ def update_current_phase(pid: int, phase: int) -> None:
         )
 
 
+def delete_project(pid: int) -> None:
+    """Delete a project and ALL its related data.
+
+    The schema uses ON DELETE CASCADE on every child table, so a single
+    DELETE on the parent row removes:
+      * checklist_items, phase_status, boq_items, contracts,
+      * blueprints, siteprep_photos, materials, financials,
+      * payment_certificates, timers
+    Uploaded files on disk are intentionally left in place (in
+    ``uploads/project_<id>/``) so an admin can audit them later if needed.
+    """
+    with get_conn() as conn:
+        conn.execute("DELETE FROM projects WHERE id=?", (pid,))
+
+
 # ============================ Phase status =================================
 def mark_phase_complete(project_id: int, phase: int) -> None:
     with get_conn() as conn:
