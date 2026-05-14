@@ -99,10 +99,11 @@ with st.sidebar:
     if selected_id is not None:
         st.subheader(t("nav.phases"))
         radio_labels: dict[int, str] = {}
+        completed_phases = db.get_completed_phases(selected_id)
         for pn in PHASE_ORDER:
-            done = db.is_phase_marked_complete(selected_id, pn)
+            done = pn in completed_phases
             prev = previous_phase(pn)
-            prereq_done = prev is None or db.is_phase_marked_complete(selected_id, prev)
+            prereq_done = prev is None or prev in completed_phases
             icon = "✅" if done else ("🔧" if prereq_done else "🔒")
             radio_labels[pn] = f"{icon}  {_phase_label(pn)}"
         st.radio(
@@ -193,7 +194,10 @@ else:
 
     # 3) Gateway enforcement: block locked phases.
     prev = previous_phase(current_phase)
-    locked = prev is not None and not db.is_phase_marked_complete(selected_id, prev)
+    locked = False
+    if prev is not None:
+        completed_phases = db.get_completed_phases(selected_id)
+        locked = prev not in completed_phases
 
     if locked:
         alert_error(t("alert.locked", phase=current_phase, prev=prev))
