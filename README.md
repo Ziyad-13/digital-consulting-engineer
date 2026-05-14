@@ -50,9 +50,3 @@ requirements.txt
   approve until every item is PASS, every required image is uploaded,
   and every required material has match_status=MATCH.
 
-### What is stubbed (intentional, per the spec)
-
-- **Phases 2–6** — The spec says "build Phase 0 and Phase 1 ONLY. Pause
-  and wait for my feedback." Phases 2–6 are reachable through the
-  navigation and show a placeholder; their checklists will be added in
-  the next iteration.

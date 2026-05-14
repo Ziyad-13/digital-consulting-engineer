@@ -6,8 +6,6 @@ Per-phase Streamlit view renderers (v2).
 * render_phase_generic    : Data-driven renderer for Phases 1+ that supports
                             the **Rework Loop**, the **Material Delivery
                             Gate**, and **Payment Certificate** generation.
-* render_phase_stub       : Placeholder shown for phases 2–6 (which will be
-                            filled in after sign-off from the product owner).
 """
 from __future__ import annotations
 
@@ -289,7 +287,7 @@ def _render_phase0_signoff(project_id: int) -> None:
 
 
 # ============================================================================
-# Generic phase renderer (Phase 1 in v2; Phases 2-6 once filled in)
+# Generic phase renderer (Phases 1-6)
 # ============================================================================
 def render_phase_generic(project_id: int, phase_number: int) -> None:
     pdef = PHASE_DEFINITIONS[phase_number]
@@ -592,13 +590,3 @@ def _render_phase_signoff(project_id: int, phase_number: int, pdef: dict) -> Non
         st.rerun()
 
 
-# ============================================================================
-# Stub for Phases 2-6 (filled in after sign-off from product owner)
-# ============================================================================
-def render_phase_stub(project_id: int, phase_number: int) -> None:
-    pdef = PHASE_DEFINITIONS[phase_number]
-    st.header(t(pdef["title_key"]))
-    alert_info(
-        "🚧 This phase has been unlocked by the gateway logic, but its "
-        "checklist will be added in the next iteration."
-    )
