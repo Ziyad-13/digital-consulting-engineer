@@ -331,17 +331,18 @@ def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> Non
     st.subheader(f"📦 {t('mat.heading')}")
     st.caption(t("mat.subheading"))
 
+    materials_state = db.get_materials(project_id, phase_number)
+
     for mat in pdef["materials"]:
-        _render_material_row(project_id, phase_number, mat)
+        _render_material_row(project_id, phase_number, mat, materials_state)
 
 
-def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
+def _render_material_row(project_id: int, phase_number: int, mat: dict, materials_state: dict) -> None:
     name = t(mat["name_key"])
     boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
     expected_qty = boq_row["quantity"] if boq_row else 0.0
     expected_unit = boq_row["unit"] if boq_row else ""
 
-    materials_state = db.get_materials(project_id, phase_number)
     cur = materials_state.get(mat["key"], {})
 
     with st.container(border=True):
