@@ -4,11 +4,8 @@ Data-driven definitions of construction phases.
 Each phase entry uses *translation keys* (not raw strings) so the renderer
 can switch language at runtime via ``i18n.t()``.
 
-For the v2 MVP we fully define Phase 1 (the first gated phase). Phase 0
+For the v2 MVP we fully define Phase 1-6. Phase 0
 is bespoke (multiple tabs) so it lives entirely inside ``phase_views.py``.
-Phases 2–6 are stubbed here only to keep PHASE_ORDER and labels consistent;
-their checklists will be filled in once Phase 0/1 are signed off by the
-product owner.
 """
 from __future__ import annotations
 
