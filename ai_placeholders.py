@@ -275,6 +275,9 @@ def run_material_match(
     if not invoice_path or delivered_qty is None or delivered_qty <= 0:
         return {"status": "PENDING", "delta_pct": None, "reason": "No invoice / qty supplied."}
 
+    if expected_qty == 0:
+        return {"status": "MISMATCH", "delta_pct": None, "reason": "Expected qty is 0, but delivered qty > 0."}
+
     diff = (delivered_qty - expected_qty) / expected_qty
     if abs(diff) <= tolerance:
         return {"status": "MATCH", "delta_pct": diff * 100,
