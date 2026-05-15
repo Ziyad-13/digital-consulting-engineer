@@ -16,6 +16,7 @@ import os
 import streamlit as st
 
 import database as db
+from database import MaterialData
 import ai_placeholders as ai
 from i18n import t, translate_boq_item
 from phase_definitions import PHASE_DEFINITIONS, next_phase
@@ -388,13 +389,15 @@ def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
             )
             db.upsert_material(
                 project_id, phase_number, mat["key"],
-                material_name=name,
-                expected_qty=expected_qty,
-                expected_unit=expected_unit,
-                delivered_qty=delivered,
-                invoice_path=invoice_path,
-                match_status=check["status"],
-                notes=check["reason"],
+                data=MaterialData(
+                    material_name=name,
+                    expected_qty=expected_qty,
+                    expected_unit=expected_unit,
+                    delivered_qty=delivered,
+                    invoice_path=invoice_path,
+                    match_status=check["status"],
+                    notes=check["reason"],
+                )
             )
             if check["status"] == "MATCH":
                 alert_success(check["reason"])

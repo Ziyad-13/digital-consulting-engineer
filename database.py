@@ -21,6 +21,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Iterable
+from dataclasses import dataclass
 
 DB_PATH = "construction_app_v2.db"
 
@@ -466,15 +467,18 @@ def get_siteprep_photos(project_id: int) -> dict[str, dict]:
 
 
 # ============================ Materials ====================================
+@dataclass
+class MaterialData:
+    material_name: str | None = None
+    expected_qty: float | None = None
+    expected_unit: str | None = None
+    delivered_qty: float | None = None
+    invoice_path: str | None = None
+    match_status: str | None = None
+    notes: str | None = None
+
 def upsert_material(
-    project_id: int, phase: int, material_key: str,
-    material_name: str | None = None,
-    expected_qty: float | None = None,
-    expected_unit: str | None = None,
-    delivered_qty: float | None = None,
-    invoice_path: str | None = None,
-    match_status: str | None = None,
-    notes: str | None = None,
+    project_id: int, phase: int, material_key: str, data: MaterialData
 ) -> None:
     now = datetime.utcnow().isoformat(timespec="seconds")
     with get_conn() as conn:
@@ -492,29 +496,29 @@ def upsert_material(
                 " match_status, notes, delivered_at) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
-                    project_id, phase, material_key, material_name,
-                    expected_qty, expected_unit,
-                    delivered_qty, invoice_path,
-                    match_status or MATCH_PENDING,
-                    notes or "",
-                    now if invoice_path else None,
+                    project_id, phase, material_key, data.material_name,
+                    data.expected_qty, data.expected_unit,
+                    data.delivered_qty, data.invoice_path,
+                    data.match_status or MATCH_PENDING,
+                    data.notes or "",
+                    now if data.invoice_path else None,
                 ),
             )
             return
 
         sets, params = [], []
         for col, val in [
-            ("material_name", material_name),
-            ("expected_qty", expected_qty),
-            ("expected_unit", expected_unit),
-            ("delivered_qty", delivered_qty),
-            ("invoice_path", invoice_path),
-            ("match_status", match_status),
-            ("notes", notes),
+            ("material_name", data.material_name),
+            ("expected_qty", data.expected_qty),
+            ("expected_unit", data.expected_unit),
+            ("delivered_qty", data.delivered_qty),
+            ("invoice_path", data.invoice_path),
+            ("match_status", data.match_status),
+            ("notes", data.notes),
         ]:
             if val is not None:
                 sets.append(f"{col}=?"); params.append(val)
-        if invoice_path is not None:
+        if data.invoice_path is not None:
             sets.append("delivered_at=?"); params.append(now)
         if not sets:
             return
