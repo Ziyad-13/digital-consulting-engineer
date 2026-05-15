@@ -165,19 +165,21 @@ def _build_summary_sheet(
     _style_header_row(ws, head_row, len(headers))
 
     total_items = 0
-    for i, cat in enumerate(CATEGORY_ORDER):
+    valid_cat_index = 0
+    for cat in CATEGORY_ORDER:
         if cat not in grouped:
             continue
         count = len(grouped[cat])
         total_items += count
-        r = head_row + 1 + i
+        r = head_row + 1 + valid_cat_index
         ws.cell(row=r, column=1, value=t(f"boq.cat.{cat}"))
         ws.cell(row=r, column=2, value=count)
         for c in (1, 2):
             ws.cell(row=r, column=c).border = _CELL_BORDER
             ws.cell(row=r, column=c).alignment = _LEFT_WRAP if c == 1 else _CENTER
-            if i % 2 == 0:
+            if valid_cat_index % 2 == 0:
                 ws.cell(row=r, column=c).fill = _ZEBRA_FILL
+        valid_cat_index += 1
 
     # Totals row
     total_row = head_row + 1 + len([c for c in CATEGORY_ORDER if c in grouped])
