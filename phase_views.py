@@ -51,7 +51,7 @@ def render_phase_0(project_id: int) -> None:
     with tab_signoff:   _render_phase0_signoff(project_id)
 
 
-def _render_blueprints_section(project_id: int) -> None:
+def _render_blueprint_upload(project_id: int) -> None:
     st.subheader(t("p0.bp.heading"))
 
     existing_bp = db.get_blueprints(project_id)
@@ -72,13 +72,7 @@ def _render_blueprints_section(project_id: int) -> None:
         alert_success(t("p0.bp.saved"))
         st.rerun()
 
-    st.subheader(t("p0.boq.heading"))
-    boq = db.get_boq_items(project_id)
-
-    if not boq:
-        st.write(t("p0.boq.empty"))
-        return
-
+def _render_boq_regeneration_controls(project_id: int) -> None:
     # ---- Regeneration controls (floors + finish level) -------------------
     with st.container(border=True):
         c1, c2, c3 = st.columns([1, 2, 2])
@@ -113,8 +107,8 @@ def _render_blueprints_section(project_id: int) -> None:
                 st.session_state[f"boq_finish_{project_id}"] = new_finish
                 st.rerun()
 
+def _render_boq_tabs(project_id: int, boq: list[dict]) -> None:
     # ---- Group BOQ items by category and render them in tabs ------------
-    boq = db.get_boq_items(project_id)
     grouped: dict[str, list[dict]] = {}
     for row in boq:
         grouped.setdefault(row.get("category", "structural"), []).append(row)
@@ -147,6 +141,7 @@ def _render_blueprints_section(project_id: int) -> None:
                     hide_index=True,
                 )
 
+def _render_boq_export(project_id: int, boq: list[dict]) -> None:
     # ---- Single-file Excel export ----------------------------------------
     project = db.get_project(project_id)
     xlsx_bytes = build_boq_workbook(
@@ -166,6 +161,23 @@ def _render_blueprints_section(project_id: int) -> None:
         type="primary",
         use_container_width=True,
     )
+
+def _render_blueprints_section(project_id: int) -> None:
+    _render_blueprint_upload(project_id)
+
+    st.subheader(t("p0.boq.heading"))
+    boq = db.get_boq_items(project_id)
+
+    if not boq:
+        st.write(t("p0.boq.empty"))
+        return
+
+    _render_boq_regeneration_controls(project_id)
+
+    # Reload boq after regeneration could change it
+    boq = db.get_boq_items(project_id)
+    _render_boq_tabs(project_id, boq)
+    _render_boq_export(project_id, boq)
 
     alert_info(t("p0.boq.disclaimer"))
 
