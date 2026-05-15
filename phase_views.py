@@ -411,6 +411,84 @@ _STATUS_BADGE = {
 }
 
 
+def _render_item_alerts(status: str, item: dict, cur: dict) -> None:
+    if status in ("FAIL", "REWORK") and item.get("warn_on_fail_key"):
+        alert_error(t(item["warn_on_fail_key"]))
+    if status == "FAIL":
+        alert_warning(t("alert.fail_explain"))
+    elif status == "REWORK":
+        alert_info(
+            t("alert.rework_in_progress", n=cur.get("rework_count", 1))
+        )
+
+def _render_item_image_upload(project_id: int, phase_number: int, key: str, item: dict, cur: dict, has_image: bool) -> None:
+    if item.get("requires_image"):
+        img_label_key = item.get("image_label_key", "btn.upload")
+        if has_image and os.path.exists(cur["image_path"]):
+            st.image(cur["image_path"], width=320)
+            st.caption(os.path.basename(cur["image_path"]))
+        uploaded = st.file_uploader(
+            t(img_label_key),
+            type=["png", "jpg", "jpeg", "pdf"],
+            key=f"img_{phase_number}_{key}",
+        )
+        if uploaded is not None:
+            path = save_uploaded_file(uploaded, project_id, phase_number, key)
+            db.upsert_checklist_item(
+                project_id, phase_number, key, image_path=path
+            )
+            alert_success(t("misc.image_uploaded"))
+            st.rerun()
+
+def _render_item_action_buttons(project_id: int, phase_number: int, key: str, item: dict, cur: dict, status: str, notes: str, materials_state: dict, has_image: bool) -> None:
+    material_blocked = False
+    if item.get("material_required"):
+        mreq = materials_state.get(item["material_required"], {})
+        if mreq.get("match_status") != "MATCH":
+            material_blocked = True
+            alert_warning(t("alert.material_required"))
+
+    image_blocked = item.get("requires_image") and not has_image
+
+    col_pass, col_fail, col_rework, col_save = st.columns(4)
+
+    pass_disabled = material_blocked or image_blocked
+    if col_pass.button(
+        t("btn.mark_pass"),
+        key=f"pass_{phase_number}_{key}",
+        disabled=pass_disabled,
+        type="primary",
+    ):
+        db.upsert_checklist_item(
+            project_id, phase_number, key, status="PASS", notes=notes
+        )
+        st.rerun()
+
+    if col_fail.button(
+        t("btn.mark_fail"), key=f"fail_{phase_number}_{key}"
+    ):
+        db.upsert_checklist_item(
+            project_id, phase_number, key, status="FAIL", notes=notes
+        )
+        st.rerun()
+
+    if col_rework.button(
+        t("btn.start_rework"),
+        key=f"rework_{phase_number}_{key}",
+        disabled=status not in ("FAIL", "REWORK"),
+    ):
+        db.start_rework(project_id, phase_number, key)
+        alert_info(t("alert.rework_in_progress",
+                     n=(cur.get("rework_count", 0) + 1)))
+        st.rerun()
+
+    if col_save.button(t("btn.save"), key=f"save_{phase_number}_{key}"):
+        db.upsert_checklist_item(
+            project_id, phase_number, key, notes=notes
+        )
+        alert_success(t("misc.image_uploaded"))
+
+
 def _render_checklist_item(
     project_id: int, phase_number: int, item: dict,
     items_state: dict, materials_state: dict,
@@ -431,7 +509,6 @@ def _render_checklist_item(
     with st.expander(f"{badge}  {label}{suffix}",
                      expanded=status in ("PENDING", "FAIL", "REWORK")):
 
-        # Notes
         notes = st.text_area(
             "📝",
             value=cur.get("notes", "") or "",
@@ -440,86 +517,9 @@ def _render_checklist_item(
             placeholder="…",
         )
 
-        # Critical-rule warning when item is in FAIL/REWORK state
-        if status in ("FAIL", "REWORK") and item.get("warn_on_fail_key"):
-            alert_error(t(item["warn_on_fail_key"]))
-
-        if status == "FAIL":
-            alert_warning(t("alert.fail_explain"))
-        elif status == "REWORK":
-            alert_info(
-                t("alert.rework_in_progress", n=cur.get("rework_count", 1))
-            )
-
-        # Image upload
-        if item.get("requires_image"):
-            img_label_key = item.get("image_label_key", "btn.upload")
-            if has_image and os.path.exists(cur["image_path"]):
-                st.image(cur["image_path"], width=320)
-                st.caption(os.path.basename(cur["image_path"]))
-            uploaded = st.file_uploader(
-                t(img_label_key),
-                type=["png", "jpg", "jpeg", "pdf"],
-                key=f"img_{phase_number}_{key}",
-            )
-            if uploaded is not None:
-                path = save_uploaded_file(uploaded, project_id, phase_number, key)
-                db.upsert_checklist_item(
-                    project_id, phase_number, key, image_path=path
-                )
-                alert_success(t("misc.image_uploaded"))
-                st.rerun()
-
-        # Material gate enforcement
-        material_blocked = False
-        if item.get("material_required"):
-            mreq = materials_state.get(item["material_required"], {})
-            if mreq.get("match_status") != "MATCH":
-                material_blocked = True
-                alert_warning(t("alert.material_required"))
-
-        # Image gate enforcement (cannot PASS without proof)
-        image_blocked = item.get("requires_image") and not has_image
-
-        # Action buttons
-        col_pass, col_fail, col_rework, col_save = st.columns(4)
-
-        pass_disabled = material_blocked or image_blocked
-        if col_pass.button(
-            t("btn.mark_pass"),
-            key=f"pass_{phase_number}_{key}",
-            disabled=pass_disabled,
-            type="primary",
-        ):
-            db.upsert_checklist_item(
-                project_id, phase_number, key, status="PASS", notes=notes
-            )
-            st.rerun()
-
-        if col_fail.button(
-            t("btn.mark_fail"), key=f"fail_{phase_number}_{key}"
-        ):
-            db.upsert_checklist_item(
-                project_id, phase_number, key, status="FAIL", notes=notes
-            )
-            st.rerun()
-
-        # Rework button only matters once the item is in FAIL state
-        if col_rework.button(
-            t("btn.start_rework"),
-            key=f"rework_{phase_number}_{key}",
-            disabled=status not in ("FAIL", "REWORK"),
-        ):
-            db.start_rework(project_id, phase_number, key)
-            alert_info(t("alert.rework_in_progress",
-                         n=(cur.get("rework_count", 0) + 1)))
-            st.rerun()
-
-        if col_save.button(t("btn.save"), key=f"save_{phase_number}_{key}"):
-            db.upsert_checklist_item(
-                project_id, phase_number, key, notes=notes
-            )
-            alert_success(t("misc.image_uploaded"))
+        _render_item_alerts(status, item, cur)
+        _render_item_image_upload(project_id, phase_number, key, item, cur, has_image)
+        _render_item_action_buttons(project_id, phase_number, key, item, cur, status, notes, materials_state, has_image)
 
 
 # --------------------- Phase sign-off & certificate -------------------------
