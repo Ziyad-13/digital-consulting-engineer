@@ -201,7 +201,13 @@ def generate_payment_certificate(
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(body_en + "\n\n" + body_ar)
 
-    db.save_payment_certificate(
-        project["id"], phase_number, cert_no, percentage, amount, file_path
+    cert = db.PaymentCertificate(
+        project_id=project["id"],
+        phase=phase_number,
+        certificate_no=cert_no,
+        percentage=percentage,
+        amount=amount,
+        file_path=file_path,
     )
+    db.save_payment_certificate(cert)
     return cert_no, file_path, amount
