@@ -1,0 +1,6 @@
+🧹 Refactor database.py to group optional parameters using TypedDict and Unpack
+
+🎯 What: Refactored `upsert_checklist_item` and `upsert_material` in `database.py` to accept a single `**updates` kwargs dictionary using `TypedDict` and `Unpack`. Also added `.gitignore` for standard python artifacts.
+💡 Why: Functions with many optional parameters are hard to read and use correctly. Grouping them improves maintainability, and iterating over the keys simplifies the update loop logic.
+✅ Verification: Tested locally by verifying both insertion and update paths. Checked call sites in `phase_views.py` and `database.py`, confirming they already use keyword arguments. Verified the changes using pytest.
+✨ Result: Reduced function signature complexity and improved code health.

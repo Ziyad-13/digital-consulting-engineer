@@ -20,7 +20,7 @@ from __future__ import annotations
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, TypedDict, Unpack
 
 DB_PATH = "construction_app_v2.db"
 
@@ -260,14 +260,18 @@ def is_phase_marked_complete(project_id: int, phase: int) -> bool:
 
 
 # ============================ Checklist ====================================
+class ChecklistItemUpdates(TypedDict, total=False):
+    status: str | None
+    notes: str | None
+    image_path: str | None
+    rework_count: int | None
+
+
 def upsert_checklist_item(
     project_id: int,
     phase: int,
     item_key: str,
-    status: str | None = None,
-    notes: str | None = None,
-    image_path: str | None = None,
-    rework_count: int | None = None,
+    **updates: Unpack[ChecklistItemUpdates],
 ) -> None:
     """Insert or partially update a checklist item.
     Only non-None fields are written, so callers can patch one field at a time."""
@@ -286,25 +290,22 @@ def upsert_checklist_item(
                 " rework_count, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     project_id, phase, item_key,
-                    status or STATUS_PENDING,
-                    notes or "",
-                    image_path,
-                    rework_count or 0,
+                    updates.get("status") or STATUS_PENDING,
+                    updates.get("notes") or "",
+                    updates.get("image_path"),
+                    updates.get("rework_count") or 0,
                     now,
                 ),
             )
             return
 
         sets, params = [], []
-        if status is not None:
-            sets.append("status=?"); params.append(status)
-        if notes is not None:
-            sets.append("notes=?"); params.append(notes)
-        if image_path is not None:
-            sets.append("image_path=?"); params.append(image_path)
-        if rework_count is not None:
-            sets.append("rework_count=?"); params.append(rework_count)
-        sets.append("updated_at=?"); params.append(now)
+        for col in ["status", "notes", "image_path", "rework_count"]:
+            if col in updates and updates[col] is not None:
+                sets.append(f"{col}=?")
+                params.append(updates[col])
+        sets.append("updated_at=?")
+        params.append(now)
         params += [project_id, phase, item_key]
         conn.execute(
             f"UPDATE checklist_items SET {', '.join(sets)} "
@@ -466,15 +467,19 @@ def get_siteprep_photos(project_id: int) -> dict[str, dict]:
 
 
 # ============================ Materials ====================================
+class MaterialUpdates(TypedDict, total=False):
+    material_name: str | None
+    expected_qty: float | None
+    expected_unit: str | None
+    delivered_qty: float | None
+    invoice_path: str | None
+    match_status: str | None
+    notes: str | None
+
+
 def upsert_material(
     project_id: int, phase: int, material_key: str,
-    material_name: str | None = None,
-    expected_qty: float | None = None,
-    expected_unit: str | None = None,
-    delivered_qty: float | None = None,
-    invoice_path: str | None = None,
-    match_status: str | None = None,
-    notes: str | None = None,
+    **updates: Unpack[MaterialUpdates],
 ) -> None:
     now = datetime.utcnow().isoformat(timespec="seconds")
     with get_conn() as conn:
@@ -485,6 +490,7 @@ def upsert_material(
         ).fetchone()
 
         if existing is None:
+            invoice_path = updates.get("invoice_path")
             conn.execute(
                 "INSERT INTO materials"
                 "(project_id, phase_number, material_key, material_name, "
@@ -492,30 +498,30 @@ def upsert_material(
                 " match_status, notes, delivered_at) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
-                    project_id, phase, material_key, material_name,
-                    expected_qty, expected_unit,
-                    delivered_qty, invoice_path,
-                    match_status or MATCH_PENDING,
-                    notes or "",
+                    project_id, phase, material_key,
+                    updates.get("material_name"),
+                    updates.get("expected_qty"),
+                    updates.get("expected_unit"),
+                    updates.get("delivered_qty"),
+                    invoice_path,
+                    updates.get("match_status") or MATCH_PENDING,
+                    updates.get("notes") or "",
                     now if invoice_path else None,
                 ),
             )
             return
 
         sets, params = [], []
-        for col, val in [
-            ("material_name", material_name),
-            ("expected_qty", expected_qty),
-            ("expected_unit", expected_unit),
-            ("delivered_qty", delivered_qty),
-            ("invoice_path", invoice_path),
-            ("match_status", match_status),
-            ("notes", notes),
+        for col in [
+            "material_name", "expected_qty", "expected_unit",
+            "delivered_qty", "invoice_path", "match_status", "notes"
         ]:
-            if val is not None:
-                sets.append(f"{col}=?"); params.append(val)
-        if invoice_path is not None:
-            sets.append("delivered_at=?"); params.append(now)
+            if col in updates and updates[col] is not None:
+                sets.append(f"{col}=?")
+                params.append(updates[col])
+        if "invoice_path" in updates and updates["invoice_path"] is not None:
+            sets.append("delivered_at=?")
+            params.append(now)
         if not sets:
             return
         params += [project_id, phase, material_key]
