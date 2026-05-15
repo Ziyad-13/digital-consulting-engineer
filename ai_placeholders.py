@@ -54,6 +54,162 @@ FINISH_LEVELS = {
 }
 
 
+def _create_boq_row(name: str, qty: float, unit: str, category: str) -> dict[str, Any]:
+    """Helper to build a BOQ row."""
+    return {"item_name": name, "quantity": round(qty, 2),
+            "unit": unit, "category": category}
+
+
+def _get_structural_items(area: float, floors: int) -> list[dict[str, Any]]:
+    return [
+        _create_boq_row("Ready-mix Concrete (SRC, sulfate-resistant)",
+            area * 0.14, "m³", CAT_STRUCT),
+        _create_boq_row("Reinforcement Steel — Ø12 mm",
+            area * 0.009, "Tons", CAT_STRUCT),
+        _create_boq_row("Reinforcement Steel — Ø16 mm",
+            area * 0.005, "Tons", CAT_STRUCT),
+        _create_boq_row("Reinforcement Steel — Ø8 mm (stirrups)",
+            area * 0.003, "Tons", CAT_STRUCT),
+        _create_boq_row("Tying Wire (steel)",
+            area * 0.0006, "Tons", CAT_STRUCT),
+        _create_boq_row("Concrete Blocks — 20 cm",
+            area * 12 * floors, "pcs", CAT_STRUCT),
+        _create_boq_row("Concrete Blocks — 10 cm (interior partitions)",
+            area * 4 * floors, "pcs", CAT_STRUCT),
+        _create_boq_row("Cement (50 kg bags)",
+            area * 1.4 * floors, "bags", CAT_STRUCT),
+        _create_boq_row("Washed Sand",
+            area * 0.35, "m³", CAT_STRUCT),
+        _create_boq_row("Crushed Gravel (aggregates)",
+            area * 0.45, "m³", CAT_STRUCT),
+        _create_boq_row("Plywood Formwork",
+            area * 1.2, "m²", CAT_STRUCT),
+        _create_boq_row("Anti-termite Pesticide",
+            area * 1.0, "L", CAT_STRUCT),
+    ]
+
+
+def _get_insulation_items(area: float, roof_area: float, ext_area: float) -> list[dict[str, Any]]:
+    return [
+        _create_boq_row("Bitumen Waterproofing (foundations)",
+            area * 0.6, "m²", CAT_INSUL),
+        _create_boq_row("Roof Waterproofing Membrane (4 mm SBS)",
+            roof_area * 1.10, "m²", CAT_INSUL),
+        _create_boq_row("Thermal Insulation — Polystyrene Boards (5 cm)",
+            roof_area + ext_area * 0.6, "m²", CAT_INSUL),
+        _create_boq_row("Vapor Barrier (PE sheet)",
+            roof_area * 1.05, "m²", CAT_INSUL),
+        _create_boq_row("Galvanized Mesh (block/concrete joints)",
+            ext_area * 0.15, "m²", CAT_INSUL),
+    ]
+
+
+def _get_mep_items(area: float, bathrooms: int) -> list[dict[str, Any]]:
+    return [
+        # Plumbing — water supply
+        _create_boq_row("PEX Water Pipe — Ø½″ (cold/hot supply)",
+            area * 1.8, "m", CAT_MEP),
+        _create_boq_row("PEX Water Pipe — Ø¾″ (mains)",
+            area * 0.8, "m", CAT_MEP),
+        # Plumbing — drainage
+        _create_boq_row("uPVC Drain Pipe — Ø4″",
+            area * 0.5, "m", CAT_MEP),
+        _create_boq_row("uPVC Drain Pipe — Ø2″",
+            area * 0.7, "m", CAT_MEP),
+        # HVAC
+        _create_boq_row("Copper Refrigerant Pipe (split AC lines)",
+            bathrooms * 12 + area * 0.05, "m", CAT_MEP),
+        _create_boq_row("Insulated AC Duct (flexible)",
+            area * 0.25, "m", CAT_MEP),
+    ]
+
+
+def _get_electrical_items(area: float, floors: int) -> list[dict[str, Any]]:
+    return [
+        _create_boq_row("Electrical Cable — 2.5 mm² (lighting/sockets)",
+            area * 4.5, "m", CAT_ELEC),
+        _create_boq_row("Electrical Cable — 4 mm² (AC circuits)",
+            area * 1.8, "m", CAT_ELEC),
+        _create_boq_row("Electrical Cable — 6 mm² (mains feeders)",
+            area * 0.4, "m", CAT_ELEC),
+        _create_boq_row("Conduit (PVC ¾″)",
+            area * 6.0, "m", CAT_ELEC),
+        _create_boq_row("Junction & Switch Boxes",
+            int(area * 0.4), "pcs", CAT_ELEC),
+        _create_boq_row("Main Distribution Panel",
+            floors, "pcs", CAT_ELEC),
+        _create_boq_row("Wall Sockets",
+            int(area * 0.2), "pcs", CAT_ELEC),
+        _create_boq_row("Light Switches",
+            int(area * 0.15), "pcs", CAT_ELEC),
+        _create_boq_row("LED Light Fittings",
+            int(area * 0.18), "pcs", CAT_ELEC),
+        _create_boq_row("Earthing/Grounding Copper Rod (Ø16 mm × 2.4 m)",
+            max(2, floors + 1), "pcs", CAT_ELEC),
+    ]
+
+
+def _get_sanitary_items(floors: int, bathrooms: int) -> list[dict[str, Any]]:
+    return [
+        _create_boq_row("Toilet (WC) Set",
+            bathrooms, "pcs", CAT_SANI),
+        _create_boq_row("Wash-basin with Pedestal",
+            bathrooms, "pcs", CAT_SANI),
+        _create_boq_row("Shower / Bath Mixer",
+            bathrooms, "pcs", CAT_SANI),
+        _create_boq_row("Basin Mixer",
+            bathrooms + 1, "pcs", CAT_SANI),
+        _create_boq_row("Kitchen Sink (stainless steel)",
+            1, "pcs", CAT_SANI),
+        _create_boq_row("Polyethylene Water Tank (1000 L)",
+            max(1, floors), "pcs", CAT_SANI),
+        _create_boq_row("Submersible Water Pump",
+            1, "pcs", CAT_SANI),
+        _create_boq_row("Electric Water Heater (50 L)",
+            bathrooms, "pcs", CAT_SANI),
+    ]
+
+
+def _get_finishes_items(
+    area: float,
+    ext_area: float,
+    floor_finish_area: float,
+    bathrooms: int,
+    luxury: bool,
+    paint_grade: str,
+    tile_grade: str,
+) -> list[dict[str, Any]]:
+    return [
+        _create_boq_row(f"Floor Tiles — {tile_grade}",
+            floor_finish_area * 1.10, "m²", CAT_FINISH),
+        _create_boq_row("Wall Tiles (bathrooms & kitchen)",
+            bathrooms * 25 + 20, "m²", CAT_FINISH),
+        _create_boq_row("Tile Adhesive",
+            (floor_finish_area + bathrooms * 25 + 20) * 5, "kg", CAT_FINISH),
+        _create_boq_row("Internal Plaster (cement/sand)",
+            ext_area * 0.4 + area * 2.5, "m²", CAT_FINISH),
+        _create_boq_row("External Plaster (weather-resistant)",
+            ext_area * 0.95, "m²", CAT_FINISH),
+        _create_boq_row(f"Interior Paint — {paint_grade} ({'3' if luxury else '2'} coats)",
+            area * 3.2, "m²", CAT_FINISH),
+        _create_boq_row("Exterior Paint (weather-shield)",
+            ext_area * 0.95, "m²", CAT_FINISH),
+        _create_boq_row("Gypsum False-Ceiling Panels",
+            area * 0.5, "m²", CAT_FINISH),
+        _create_boq_row("Wooden Interior Door (with frame)",
+            int(area * 0.025) + bathrooms, "pcs", CAT_FINISH),
+        _create_boq_row("Aluminum Window (incl. glass)",
+            int(area * 0.10), "m²", CAT_FINISH),
+        _create_boq_row("Main Entrance Steel/Wood Door",
+            1, "pcs", CAT_FINISH),
+        _create_boq_row("Stone Cladding for Façade"
+            + (" — natural" if luxury else " — manufactured"),
+            ext_area * 0.45, "m²", CAT_FINISH),
+        _create_boq_row("Mechanical Stone Anchors (stainless steel)",
+            ext_area * 0.45 * 4, "pcs", CAT_FINISH),
+    ]
+
+
 def estimate_boq(
     blueprint_data: dict[str, Any],
     floors: int | None = None,
@@ -95,135 +251,22 @@ def estimate_boq(
     # Sanitary fixtures scale with floors (one bathroom per floor + a guest WC).
     bathrooms = max(2, floors + 1)
 
-    # Helper to build a row.
-    def row(name: str, qty: float, unit: str, category: str) -> dict:
-        return {"item_name": name, "quantity": round(qty, 2),
-                "unit": unit, "category": category}
+    items: list[dict[str, Any]] = []
+    items.extend(_get_structural_items(area, floors))
+    items.extend(_get_insulation_items(area, roof_area, ext_area))
+    items.extend(_get_mep_items(area, bathrooms))
+    items.extend(_get_electrical_items(area, floors))
+    items.extend(_get_sanitary_items(floors, bathrooms))
+    items.extend(_get_finishes_items(
+        area=area,
+        ext_area=ext_area,
+        floor_finish_area=floor_finish_area,
+        bathrooms=bathrooms,
+        luxury=luxury,
+        paint_grade=paint_grade,
+        tile_grade=tile_grade,
+    ))
 
-    items: list[dict] = [
-        # ================== STRUCTURAL ==================
-        row("Ready-mix Concrete (SRC, sulfate-resistant)",
-            area * 0.14, "m³", CAT_STRUCT),
-        row("Reinforcement Steel — Ø12 mm",
-            area * 0.009, "Tons", CAT_STRUCT),
-        row("Reinforcement Steel — Ø16 mm",
-            area * 0.005, "Tons", CAT_STRUCT),
-        row("Reinforcement Steel — Ø8 mm (stirrups)",
-            area * 0.003, "Tons", CAT_STRUCT),
-        row("Tying Wire (steel)",
-            area * 0.0006, "Tons", CAT_STRUCT),
-        row("Concrete Blocks — 20 cm",
-            area * 12 * floors, "pcs", CAT_STRUCT),
-        row("Concrete Blocks — 10 cm (interior partitions)",
-            area * 4 * floors, "pcs", CAT_STRUCT),
-        row("Cement (50 kg bags)",
-            area * 1.4 * floors, "bags", CAT_STRUCT),
-        row("Washed Sand",
-            area * 0.35, "m³", CAT_STRUCT),
-        row("Crushed Gravel (aggregates)",
-            area * 0.45, "m³", CAT_STRUCT),
-        row("Plywood Formwork",
-            area * 1.2, "m²", CAT_STRUCT),
-        row("Anti-termite Pesticide",
-            area * 1.0, "L", CAT_STRUCT),
-
-        # ================== INSULATION ==================
-        row("Bitumen Waterproofing (foundations)",
-            area * 0.6, "m²", CAT_INSUL),
-        row("Roof Waterproofing Membrane (4 mm SBS)",
-            roof_area * 1.10, "m²", CAT_INSUL),
-        row("Thermal Insulation — Polystyrene Boards (5 cm)",
-            roof_area + ext_area * 0.6, "m²", CAT_INSUL),
-        row("Vapor Barrier (PE sheet)",
-            roof_area * 1.05, "m²", CAT_INSUL),
-        row("Galvanized Mesh (block/concrete joints)",
-            ext_area * 0.15, "m²", CAT_INSUL),
-
-        # ================== MEP ==================
-        # Plumbing — water supply
-        row("PEX Water Pipe — Ø½″ (cold/hot supply)",
-            area * 1.8, "m", CAT_MEP),
-        row("PEX Water Pipe — Ø¾″ (mains)",
-            area * 0.8, "m", CAT_MEP),
-        # Plumbing — drainage
-        row("uPVC Drain Pipe — Ø4″",
-            area * 0.5, "m", CAT_MEP),
-        row("uPVC Drain Pipe — Ø2″",
-            area * 0.7, "m", CAT_MEP),
-        # HVAC
-        row("Copper Refrigerant Pipe (split AC lines)",
-            bathrooms * 12 + area * 0.05, "m", CAT_MEP),
-        row("Insulated AC Duct (flexible)",
-            area * 0.25, "m", CAT_MEP),
-        # ================== ELECTRICAL ==================
-        row("Electrical Cable — 2.5 mm² (lighting/sockets)",
-            area * 4.5, "m", CAT_ELEC),
-        row("Electrical Cable — 4 mm² (AC circuits)",
-            area * 1.8, "m", CAT_ELEC),
-        row("Electrical Cable — 6 mm² (mains feeders)",
-            area * 0.4, "m", CAT_ELEC),
-        row("Conduit (PVC ¾″)",
-            area * 6.0, "m", CAT_ELEC),
-        row("Junction & Switch Boxes",
-            int(area * 0.4), "pcs", CAT_ELEC),
-        row("Main Distribution Panel",
-            floors, "pcs", CAT_ELEC),
-        row("Wall Sockets",
-            int(area * 0.2), "pcs", CAT_ELEC),
-        row("Light Switches",
-            int(area * 0.15), "pcs", CAT_ELEC),
-        row("LED Light Fittings",
-            int(area * 0.18), "pcs", CAT_ELEC),
-        row("Earthing/Grounding Copper Rod (Ø16 mm × 2.4 m)",
-            max(2, floors + 1), "pcs", CAT_ELEC),
-
-        # ================== SANITARY ==================
-        row("Toilet (WC) Set",
-            bathrooms, "pcs", CAT_SANI),
-        row("Wash-basin with Pedestal",
-            bathrooms, "pcs", CAT_SANI),
-        row("Shower / Bath Mixer",
-            bathrooms, "pcs", CAT_SANI),
-        row("Basin Mixer",
-            bathrooms + 1, "pcs", CAT_SANI),
-        row("Kitchen Sink (stainless steel)",
-            1, "pcs", CAT_SANI),
-        row("Polyethylene Water Tank (1000 L)",
-            max(1, floors), "pcs", CAT_SANI),
-        row("Submersible Water Pump",
-            1, "pcs", CAT_SANI),
-        row("Electric Water Heater (50 L)",
-            bathrooms, "pcs", CAT_SANI),
-
-        # ================== FINISHES ==================
-        row(f"Floor Tiles — {tile_grade}",
-            floor_finish_area * 1.10, "m²", CAT_FINISH),
-        row("Wall Tiles (bathrooms & kitchen)",
-            bathrooms * 25 + 20, "m²", CAT_FINISH),
-        row("Tile Adhesive",
-            (floor_finish_area + bathrooms * 25 + 20) * 5, "kg", CAT_FINISH),
-        row("Internal Plaster (cement/sand)",
-            ext_area * 0.4 + area * 2.5, "m²", CAT_FINISH),
-        row("External Plaster (weather-resistant)",
-            ext_area * 0.95, "m²", CAT_FINISH),
-        row(f"Interior Paint — {paint_grade} ({'3' if luxury else '2'} coats)",
-            area * 3.2, "m²", CAT_FINISH),
-        row("Exterior Paint (weather-shield)",
-            ext_area * 0.95, "m²", CAT_FINISH),
-        row("Gypsum False-Ceiling Panels",
-            area * 0.5, "m²", CAT_FINISH),
-        row("Wooden Interior Door (with frame)",
-            int(area * 0.025) + bathrooms, "pcs", CAT_FINISH),
-        row("Aluminum Window (incl. glass)",
-            int(area * 0.10), "m²", CAT_FINISH),
-        row("Main Entrance Steel/Wood Door",
-            1, "pcs", CAT_FINISH),
-        row("Stone Cladding for Façade"
-            + (" — natural" if luxury else " — manufactured"),
-            ext_area * 0.45, "m²", CAT_FINISH),
-        row("Mechanical Stone Anchors (stainless steel)",
-            ext_area * 0.45 * 4, "pcs", CAT_FINISH),
-    ]
     return items
 
 
