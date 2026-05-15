@@ -48,133 +48,137 @@ def get_conn():
         conn.close()
 
 
+def _create_tables(conn: sqlite3.Connection) -> None:
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS projects (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            name          TEXT    NOT NULL,
+            budget        REAL    DEFAULT 0,
+            current_phase INTEGER DEFAULT 0,
+            location      TEXT    DEFAULT '',
+            created_at    TEXT    DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS phase_status (
+            project_id    INTEGER NOT NULL,
+            phase_number  INTEGER NOT NULL,
+            completed     INTEGER DEFAULT 0,
+            completed_at  TEXT,
+            PRIMARY KEY(project_id, phase_number),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS checklist_items (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id    INTEGER NOT NULL,
+            phase_number  INTEGER NOT NULL,
+            item_key      TEXT    NOT NULL,
+            status        TEXT    DEFAULT 'PENDING',  -- PENDING/PASS/FAIL/REWORK
+            notes         TEXT    DEFAULT '',
+            image_path    TEXT,
+            rework_count  INTEGER DEFAULT 0,
+            updated_at    TEXT    DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(project_id, phase_number, item_key),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS boq_items (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id  INTEGER NOT NULL,
+            item_name   TEXT    NOT NULL,
+            quantity    REAL,
+            unit        TEXT,
+            category    TEXT    DEFAULT 'structural',
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS contracts (
+            project_id       INTEGER PRIMARY KEY,
+            file_path        TEXT,
+            risks_accepted   INTEGER DEFAULT 0,
+            missing_clauses  TEXT,
+            skipped          INTEGER DEFAULT 0,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS blueprints (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id  INTEGER NOT NULL,
+            file_path   TEXT,
+            uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS siteprep_photos (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id  INTEGER NOT NULL,
+            kind        TEXT    NOT NULL,            -- 'fencing' | 'board'
+            file_path   TEXT,
+            uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(project_id, kind),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS materials (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id      INTEGER NOT NULL,
+            phase_number    INTEGER NOT NULL,
+            material_key    TEXT    NOT NULL,
+            material_name   TEXT,
+            expected_qty    REAL,
+            expected_unit   TEXT,
+            delivered_qty   REAL,
+            invoice_path    TEXT,
+            match_status    TEXT    DEFAULT 'PENDING',   -- PENDING/MATCH/MISMATCH
+            notes           TEXT,
+            delivered_at    TEXT,
+            UNIQUE(project_id, phase_number, material_key),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS financials (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id      INTEGER NOT NULL,
+            phase_number    INTEGER NOT NULL,
+            milestone_name  TEXT,
+            percentage      REAL,
+            paid            INTEGER DEFAULT 0,
+            paid_at         TEXT,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS payment_certificates (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id      INTEGER NOT NULL,
+            phase_number    INTEGER NOT NULL,
+            certificate_no  TEXT NOT NULL,
+            percentage      REAL,
+            amount          REAL,
+            file_path       TEXT,
+            issued_at       TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS timers (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            project_id      INTEGER NOT NULL,
+            phase_number    INTEGER NOT NULL,
+            timer_key       TEXT    NOT NULL,
+            label           TEXT,
+            started_at      TEXT DEFAULT CURRENT_TIMESTAMP,
+            duration_seconds INTEGER,
+            completed       INTEGER DEFAULT 0,
+            UNIQUE(project_id, phase_number, timer_key),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+        """
+    )
+
+
 def init_db() -> None:
     with get_conn() as conn:
-        conn.executescript(
-            """
-            CREATE TABLE IF NOT EXISTS projects (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                name          TEXT    NOT NULL,
-                budget        REAL    DEFAULT 0,
-                current_phase INTEGER DEFAULT 0,
-                location      TEXT    DEFAULT '',
-                created_at    TEXT    DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS phase_status (
-                project_id    INTEGER NOT NULL,
-                phase_number  INTEGER NOT NULL,
-                completed     INTEGER DEFAULT 0,
-                completed_at  TEXT,
-                PRIMARY KEY(project_id, phase_number),
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS checklist_items (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id    INTEGER NOT NULL,
-                phase_number  INTEGER NOT NULL,
-                item_key      TEXT    NOT NULL,
-                status        TEXT    DEFAULT 'PENDING',  -- PENDING/PASS/FAIL/REWORK
-                notes         TEXT    DEFAULT '',
-                image_path    TEXT,
-                rework_count  INTEGER DEFAULT 0,
-                updated_at    TEXT    DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(project_id, phase_number, item_key),
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS boq_items (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id  INTEGER NOT NULL,
-                item_name   TEXT    NOT NULL,
-                quantity    REAL,
-                unit        TEXT,
-                category    TEXT    DEFAULT 'structural',
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS contracts (
-                project_id       INTEGER PRIMARY KEY,
-                file_path        TEXT,
-                risks_accepted   INTEGER DEFAULT 0,
-                missing_clauses  TEXT,
-                skipped          INTEGER DEFAULT 0,
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS blueprints (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id  INTEGER NOT NULL,
-                file_path   TEXT,
-                uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS siteprep_photos (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id  INTEGER NOT NULL,
-                kind        TEXT    NOT NULL,            -- 'fencing' | 'board'
-                file_path   TEXT,
-                uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(project_id, kind),
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS materials (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id      INTEGER NOT NULL,
-                phase_number    INTEGER NOT NULL,
-                material_key    TEXT    NOT NULL,
-                material_name   TEXT,
-                expected_qty    REAL,
-                expected_unit   TEXT,
-                delivered_qty   REAL,
-                invoice_path    TEXT,
-                match_status    TEXT    DEFAULT 'PENDING',   -- PENDING/MATCH/MISMATCH
-                notes           TEXT,
-                delivered_at    TEXT,
-                UNIQUE(project_id, phase_number, material_key),
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS financials (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id      INTEGER NOT NULL,
-                phase_number    INTEGER NOT NULL,
-                milestone_name  TEXT,
-                percentage      REAL,
-                paid            INTEGER DEFAULT 0,
-                paid_at         TEXT,
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS payment_certificates (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id      INTEGER NOT NULL,
-                phase_number    INTEGER NOT NULL,
-                certificate_no  TEXT NOT NULL,
-                percentage      REAL,
-                amount          REAL,
-                file_path       TEXT,
-                issued_at       TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS timers (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                project_id      INTEGER NOT NULL,
-                phase_number    INTEGER NOT NULL,
-                timer_key       TEXT    NOT NULL,
-                label           TEXT,
-                started_at      TEXT DEFAULT CURRENT_TIMESTAMP,
-                duration_seconds INTEGER,
-                completed       INTEGER DEFAULT 0,
-                UNIQUE(project_id, phase_number, timer_key),
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
-            );
-            """
-        )
+        _create_tables(conn)
         _run_migrations(conn)
 
 
