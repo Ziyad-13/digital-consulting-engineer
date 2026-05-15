@@ -21,6 +21,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Iterable
+from dataclasses import dataclass
 
 DB_PATH = "construction_app_v2.db"
 
@@ -575,16 +576,22 @@ def get_financials(project_id: int) -> list[dict]:
 
 
 # ============================ Payment certificates ========================
-def save_payment_certificate(
-    project_id: int, phase: int, certificate_no: str,
-    percentage: float, amount: float, file_path: str,
-) -> None:
+@dataclass
+class PaymentCertificate:
+    project_id: int
+    phase: int
+    certificate_no: str
+    percentage: float
+    amount: float
+    file_path: str
+
+def save_payment_certificate(cert: PaymentCertificate) -> None:
     with get_conn() as conn:
         conn.execute(
             "INSERT INTO payment_certificates"
             "(project_id, phase_number, certificate_no, percentage, amount, file_path) "
             "VALUES (?, ?, ?, ?, ?, ?)",
-            (project_id, phase, certificate_no, percentage, amount, file_path),
+            (cert.project_id, cert.phase, cert.certificate_no, cert.percentage, cert.amount, cert.file_path),
         )
 
 
