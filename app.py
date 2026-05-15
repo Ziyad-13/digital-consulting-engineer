@@ -13,7 +13,7 @@ import streamlit as st
 
 import database as db
 from i18n import t, init_lang, current_lang, SUPPORTED_LANGS
-from phase_definitions import PHASE_DEFINITIONS, PHASE_ORDER, previous_phase
+from phase_definitions import PHASE_ORDER, previous_phase
 from phase_views import render_phase_0, render_phase_generic
 from utils import (
     inject_styles, render_progress_bar, render_header_with_logo,
