@@ -1,0 +1,4 @@
+## 2024-05-24 - [Path Traversal in File Uploads]
+**Vulnerability:** Path traversal vulnerability due to using user-supplied filenames (`uploaded_file.name`) directly in `os.path.join` without extraction of the base filename.
+**Learning:** In Streamlit file uploads, the filename metadata can still contain path structures (like `../../` or forward slashes). When these are joined with the root storage directory, they can result in storing files completely outside the expected domain (such as `/etc/passwd`). While prepending timestamps sometimes limits path traversal attacks, stripping out directory components using `os.path.basename` is the standard, safest mitigation to prevent manipulation of the filesystem.
+**Prevention:** Always sanitize or extract user-supplied filenames using `os.path.basename` before joining them into file system paths.
