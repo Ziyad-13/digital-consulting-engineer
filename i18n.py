@@ -575,6 +575,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                       "ar": "تعتمد هذه الشهادة صرف دفعة المرحلة للمقاول."},
 
     # ----- Misc -----
+    "alert.rework_disabled":  {"en": "Rework can only be started if the item has FAILED.",
+                               "ar": "لا يمكن بدء إعادة العمل إلا إذا فشل البند."},
     "misc.disabled_locked": {"en": "🔒 Locked (previous phase not approved)",
                              "ar": "🔒 مغلق (المرحلة السابقة لم تُعتمد بعد)"},
     "misc.rework_count":    {"en": "Rework attempts: {n}",
