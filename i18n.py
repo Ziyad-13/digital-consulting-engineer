@@ -135,6 +135,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                                "ar": "تم تسجيل فشل لهذا البند. بعد المعالجة في الموقع، اضغط إعادة الإرسال لبدء دورة إعادة العمل."},
     "alert.rework_in_progress":{"en": "Rework cycle #{n} in progress. Upload new proof, then mark PASS.",
                                 "ar": "جارية دورة إعادة العمل رقم {n}. ارفع دليلًا جديدًا ثم اعتمد البند."},
+    "alert.rework_disabled_help":{"en": "Item must be marked FAIL before starting rework.",
+                                  "ar": "يجب تسجيل فشل البند قبل بدء إعادة العمل."},
     "alert.outstanding":      {"en": "Outstanding items before this phase can be approved:",
                                "ar": "البنود المتبقية قبل اعتماد المرحلة:"},
     "alert.all_passed":       {"en": "All checklist items passed and proofs uploaded.",
