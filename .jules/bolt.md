@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 Queries in Streamlit Layouts
+**Learning:** Streamlit rendering loops (like generating phase pills or sidebar radios) can easily cause N+1 query problems if a database call like `is_phase_marked_complete` is inside the loop. This specific architecture makes N+1 issues especially invisible because layout generation feels "free", but executing repeated queries significantly degrades perceived performance.
+**Action:** When adding loops in Streamlit components, fetch layout state in a single batched query (e.g. returning a `set` of completed phases) BEFORE entering the loop, allowing O(1) lookups inside the loop.

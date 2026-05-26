@@ -99,10 +99,14 @@ with st.sidebar:
     if selected_id is not None:
         st.subheader(t("nav.phases"))
         radio_labels: dict[int, str] = {}
+
+        # ⚡ Bolt: Fetch completed phases once to avoid 2*N queries in the loop
+        completed_phases = db.get_completed_phases(selected_id)
+
         for pn in PHASE_ORDER:
-            done = db.is_phase_marked_complete(selected_id, pn)
+            done = pn in completed_phases
             prev = previous_phase(pn)
-            prereq_done = prev is None or db.is_phase_marked_complete(selected_id, prev)
+            prereq_done = prev is None or prev in completed_phases
             icon = "✅" if done else ("🔧" if prereq_done else "🔒")
             radio_labels[pn] = f"{icon}  {_phase_label(pn)}"
         st.radio(
@@ -178,8 +182,11 @@ else:
     project = db.get_project(selected_id)
     current_phase: int = st.session_state.get("current_phase_nav", 0)
 
+    # ⚡ Bolt: Use the completed_phases set fetched in the sidebar to prevent further DB queries
+    # It is guaranteed to be available from the sidebar block because `selected_id` is present
+
     # 1) Sticky progress bar at the very top of the main column.
-    render_progress_bar(selected_id, current_phase, PHASE_ORDER)
+    render_progress_bar(selected_id, current_phase, PHASE_ORDER, completed_phases)
 
     # 2) Header with title + duck logo
     render_header_with_logo(project["name"])
@@ -193,7 +200,7 @@ else:
 
     # 3) Gateway enforcement: block locked phases.
     prev = previous_phase(current_phase)
-    locked = prev is not None and not db.is_phase_marked_complete(selected_id, prev)
+    locked = prev is not None and prev not in completed_phases
 
     if locked:
         alert_error(t("alert.locked", phase=current_phase, prev=prev))
