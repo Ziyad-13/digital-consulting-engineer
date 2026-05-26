@@ -133,6 +133,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                                "ar": "يجب أن تطابق فاتورة التوريد جدول الكميات قبل اعتماد هذا البند."},
     "alert.fail_explain":     {"en": "This item failed. After fixing on site, click Re-submit to start the rework cycle.",
                                "ar": "تم تسجيل فشل لهذا البند. بعد المعالجة في الموقع، اضغط إعادة الإرسال لبدء دورة إعادة العمل."},
+    "alert.rework_disabled_help": {"en": "You can only start rework if the item has failed.",
+                                   "ar": "يمكنك بدء إعادة العمل فقط إذا كان البند فاشلاً."},
     "alert.rework_in_progress":{"en": "Rework cycle #{n} in progress. Upload new proof, then mark PASS.",
                                 "ar": "جارية دورة إعادة العمل رقم {n}. ارفع دليلًا جديدًا ثم اعتمد البند."},
     "alert.outstanding":      {"en": "Outstanding items before this phase can be approved:",
