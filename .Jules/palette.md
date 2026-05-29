@@ -1,0 +1,3 @@
+## 2026-05-29 - Tooltips for disabled Streamlit buttons
+**Learning:** `st.button` components do not easily accept standard `aria-label` tags, and simply passing `disabled=True` leaves users without context on *why* the action is blocked. This creates a frustrating and inaccessible experience, particularly when specific conditions (like missing image uploads or materials) must be met first.
+**Action:** Utilize the native `help` parameter (`st.button(..., help='reasoning')`) to provide inline context and explanations when a button is in a disabled state, rather than just disabling it silently. This significantly improves UX by guiding users on the corrective actions needed.
