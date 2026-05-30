@@ -1,0 +1,3 @@
+## 2026-05-30 - Streamlit N+1 layout rendering anti-pattern
+**Learning:** In Streamlit applications, iterative layout rendering (like creating loops for progress bars or sidebar navigation menus) can quickly cause N+1 query performance bottlenecks if database fetch calls like `is_phase_marked_complete` are placed inside the iteration loop.
+**Action:** Always batch fetch database lookup data (e.g., returning a `set` for O(1) lookups) before iteration loops in Streamlit components to prevent N+1 queries during render loops.
