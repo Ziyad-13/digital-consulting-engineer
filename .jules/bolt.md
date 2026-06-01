@@ -1,0 +1,3 @@
+## 2024-06-01 - N+1 Query Anti-Pattern in Streamlit Layouts
+**Learning:** In Streamlit applications, rendering iterations (like loops for phase navigation bars or progress pills) can trigger N+1 query problems if database calls (e.g., `db.is_phase_marked_complete`) are made inside the loop for each item. This causes unnecessary database round-trips for components that render frequently upon every user interaction.
+**Action:** When implementing or modifying Streamlit layout loops, use batched database queries at the top of the component/file and store the results in an O(1) lookup structure (like a `set` for booleans) to avoid querying the database repeatedly inside the loop.
