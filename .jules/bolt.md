@@ -1,0 +1,3 @@
+## 2024-06-02 - N+1 query loop in Streamlit View rendering
+**Learning:** In `phase_views.py`, Streamlit layout components are frequently built within `for` loops (e.g. iterating over phase materials to render rows). Passing data resolution functions down into these loops that call local database queries causes N+1 query bottlenecks that add up and slow down UI responsiveness.
+**Action:** Always pre-fetch the data (such as materials status and boq dictionaries) ahead of the loop in the parent container context, and pass those resolved lookup dicts into the row renderer to achieve O(1) loop iteration latency.
