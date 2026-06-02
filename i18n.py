@@ -581,6 +581,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                              "ar": "عدد محاولات إعادة العمل: {n}"},
     "misc.image_uploaded":  {"en": "Image uploaded.",
                              "ar": "تم رفع الصورة."},
+    "misc.pass_disabled_reason": {"en": "Action disabled: Missing required material match or image proof.",
+                                  "ar": "الإجراء معطل: تنقص مطابقة المواد المطلوبة أو إثبات الصورة."},
+    "misc.rework_disabled_reason": {"en": "Rework can only be started when the item is marked as FAIL.",
+                                    "ar": "يمكن بدء إعادة العمل فقط عندما يتم تمييز البند كـ غير مجتاز (FAIL)."},
 }
 
 

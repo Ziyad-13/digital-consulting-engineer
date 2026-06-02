@@ -1,0 +1,3 @@
+## 2025-01-28 - Tooltips for disabled Streamlit buttons
+**Learning:** Streamlit `st.button`s don't conventionally support `aria-label` tags without extensive custom components. However, Streamlit provides a native `help` parameter (`st.button(..., help='...')`) which renders as a tooltip on hover. This natively supports communicating disabled state reasons effectively to users without requiring custom frontend hacks.
+**Action:** When evaluating disabled states in Streamlit (like a disabled "Mark Pass" button due to missing images), leverage the `help` parameter to provide an inline, translated explanation to the user about why the interaction is blocked, significantly reducing user frustration.
