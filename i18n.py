@@ -581,6 +581,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                              "ar": "عدد محاولات إعادة العمل: {n}"},
     "misc.image_uploaded":  {"en": "Image uploaded.",
                              "ar": "تم رفع الصورة."},
+    "misc.disabled_image":  {"en": "Upload an image proof first to enable this.",
+                             "ar": "ارفع صورة الإثبات أولاً لتفعيل هذا الخيار."},
+    "misc.disabled_material":{"en": "Material match required before passing.",
+                              "ar": "يتطلب مطابقة المواد قبل اعتماد هذا البند."},
+    "misc.disabled_both":   {"en": "Material match & image proof required.",
+                             "ar": "يتطلب مطابقة المواد ورفع صورة الإثبات."},
+    "misc.disabled_rework_btn": {"en": "Only available when the item has failed.",
+                                 "ar": "متاح فقط عندما يكون البند في حالة فشل."},
 }
 
 
