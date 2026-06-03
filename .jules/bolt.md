@@ -1,0 +1,3 @@
+## 2026-06-03 - Eliminating N+1 Queries in Streamlit Render Loops
+**Learning:** Streamlit applications often suffer from N+1 query performance issues when database fetch calls are placed inside loops iterating over layout components. Specifically, fetching a database item for every element in a loop (like iterating through `pdef["materials"]` and querying `boq_match_name` individually) significantly increases the number of sequential database calls.
+**Action:** When rendering iterative components, batch your database queries before the loop begins. Fetch all necessary data (e.g., `boq_items`, `materials_state`) into O(1) dictionary lookups at the top of the render function, and pass these pre-fetched states down to the child rendering functions.

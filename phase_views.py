@@ -331,17 +331,22 @@ def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> Non
     st.subheader(f"📦 {t('mat.heading')}")
     st.caption(t("mat.subheading"))
 
+    # Fetch BOQ items and materials state once to prevent N+1 queries in the loop
+    # Expected performance impact: Reduces database calls in phase view from O(N) to O(1)
+    boq_items = db.get_boq_items(project_id)
+    boq_dict = {item["item_name"]: item for item in boq_items}
+    materials_state = db.get_materials(project_id, phase_number)
+
     for mat in pdef["materials"]:
-        _render_material_row(project_id, phase_number, mat)
+        _render_material_row(project_id, phase_number, mat, boq_dict, materials_state)
 
 
-def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
+def _render_material_row(project_id: int, phase_number: int, mat: dict, boq_dict: dict, materials_state: dict) -> None:
     name = t(mat["name_key"])
-    boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
+    boq_row = boq_dict.get(mat["boq_match_name"])
     expected_qty = boq_row["quantity"] if boq_row else 0.0
     expected_unit = boq_row["unit"] if boq_row else ""
 
-    materials_state = db.get_materials(project_id, phase_number)
     cur = materials_state.get(mat["key"], {})
 
     with st.container(border=True):
