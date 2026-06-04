@@ -303,28 +303,38 @@ def render_phase_generic(project_id: int, phase_number: int) -> None:
     if weather.get("advice_key"):
         alert_warning(t(weather["advice_key"]))
 
+    # Pre-fetch data for this phase to avoid N+1 queries in loops
+    items_state = db.get_checklist_items(project_id, phase_number)
+    materials_state = db.get_materials(project_id, phase_number)
+    boq_items_list = db.get_boq_items(project_id)
+    boq_items_dict = {row["item_name"]: row for row in boq_items_list}
+
     # 1) Material Delivery Gate (rendered first because checklist items
     #    depend on its match status).
-    _render_material_gate(project_id, phase_number, pdef)
+    _render_material_gate(
+        project_id, phase_number, pdef, materials_state, boq_items_dict
+    )
 
     st.markdown("---")
     st.subheader("📋")
 
     # 2) Checklist
-    items_state = db.get_checklist_items(project_id, phase_number)
-    materials_state = db.get_materials(project_id, phase_number)
-
     for item in pdef["items"]:
         _render_checklist_item(
             project_id, phase_number, item, items_state, materials_state
         )
 
     st.markdown("---")
-    _render_phase_signoff(project_id, phase_number, pdef)
+    _render_phase_signoff(
+        project_id, phase_number, pdef, items_state, materials_state
+    )
 
 
 # --------------------- Material Delivery Gate -------------------------------
-def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> None:
+def _render_material_gate(
+    project_id: int, phase_number: int, pdef: dict,
+    materials_state: dict, boq_items_dict: dict
+) -> None:
     if not pdef.get("materials"):
         return
 
@@ -332,16 +342,20 @@ def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> Non
     st.caption(t("mat.subheading"))
 
     for mat in pdef["materials"]:
-        _render_material_row(project_id, phase_number, mat)
+        _render_material_row(
+            project_id, phase_number, mat, materials_state, boq_items_dict
+        )
 
 
-def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
+def _render_material_row(
+    project_id: int, phase_number: int, mat: dict,
+    materials_state: dict, boq_items_dict: dict
+) -> None:
     name = t(mat["name_key"])
-    boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
+    boq_row = boq_items_dict.get(mat["boq_match_name"])
     expected_qty = boq_row["quantity"] if boq_row else 0.0
     expected_unit = boq_row["unit"] if boq_row else ""
 
-    materials_state = db.get_materials(project_id, phase_number)
     cur = materials_state.get(mat["key"], {})
 
     with st.container(border=True):
@@ -523,10 +537,10 @@ def _render_checklist_item(
 
 
 # --------------------- Phase sign-off & certificate -------------------------
-def _render_phase_signoff(project_id: int, phase_number: int, pdef: dict) -> None:
-    items_state = db.get_checklist_items(project_id, phase_number)
-    materials_state = db.get_materials(project_id, phase_number)
-
+def _render_phase_signoff(
+    project_id: int, phase_number: int, pdef: dict,
+    items_state: dict, materials_state: dict
+) -> None:
     pending: list[str] = []
     for item in pdef["items"]:
         cur = items_state.get(item["key"], {})
