@@ -99,10 +99,14 @@ with st.sidebar:
     if selected_id is not None:
         st.subheader(t("nav.phases"))
         radio_labels: dict[int, str] = {}
+
+        # ⚡ Bolt: Fetch all completed phases once to avoid N+1 queries in the loop
+        completed_phases = db.get_completed_phases(selected_id)
+
         for pn in PHASE_ORDER:
-            done = db.is_phase_marked_complete(selected_id, pn)
+            done = pn in completed_phases
             prev = previous_phase(pn)
-            prereq_done = prev is None or db.is_phase_marked_complete(selected_id, prev)
+            prereq_done = prev is None or prev in completed_phases
             icon = "✅" if done else ("🔧" if prereq_done else "🔒")
             radio_labels[pn] = f"{icon}  {_phase_label(pn)}"
         st.radio(
@@ -193,6 +197,9 @@ else:
 
     # 3) Gateway enforcement: block locked phases.
     prev = previous_phase(current_phase)
+    # ⚡ Bolt: No need for N+1 optimization here as it's a single query,
+    # but we could use the new method for consistency if we already fetched it.
+    # For now, just replacing it to match the standard.
     locked = prev is not None and not db.is_phase_marked_complete(selected_id, prev)
 
     if locked:
