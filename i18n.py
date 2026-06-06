@@ -575,6 +575,12 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                       "ar": "تعتمد هذه الشهادة صرف دفعة المرحلة للمقاول."},
 
     # ----- Misc -----
+    "help.pass_disabled_material": {"en": "Material delivery must MATCH to pass.",
+                                    "ar": "يجب مطابقة توريد المواد للاعتماد."},
+    "help.pass_disabled_image":    {"en": "An image proof is required to pass.",
+                                    "ar": "يلزم رفع صورة إثبات للاعتماد."},
+    "help.rework_disabled":        {"en": "Item must be marked FAIL before rework.",
+                                    "ar": "يجب وضع علامة 'مرفوض' قبل إعادة العمل."},
     "misc.disabled_locked": {"en": "🔒 Locked (previous phase not approved)",
                              "ar": "🔒 مغلق (المرحلة السابقة لم تُعتمد بعد)"},
     "misc.rework_count":    {"en": "Rework attempts: {n}",
