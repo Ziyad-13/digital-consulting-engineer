@@ -259,6 +259,16 @@ def is_phase_marked_complete(project_id: int, phase: int) -> bool:
         return bool(row and row["completed"])
 
 
+def get_completed_phases(project_id: int) -> set[int]:
+    """Return a set of phase numbers that are marked complete for O(1) lookups."""
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT phase_number FROM phase_status WHERE project_id=? AND completed=1",
+            (project_id,),
+        ).fetchall()
+        return {r["phase_number"] for r in rows}
+
+
 # ============================ Checklist ====================================
 def upsert_checklist_item(
     project_id: int,
