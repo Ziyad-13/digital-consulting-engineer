@@ -1,0 +1,3 @@
+## 2024-11-20 - Adding Tooltips to Disabled Buttons in Streamlit
+**Learning:** Discovered that disabled buttons in Streamlit (e.g., `st.button(..., disabled=True)`) do not inherently communicate *why* they are disabled. However, Streamlit supports passing a `help` parameter to render a native tooltip. This is crucial for accessibility and user experience, as it allows us to dynamically explain the disabled state (e.g., missing material, missing image, or waiting for a specific prior state like 'FAIL').
+**Action:** When implementing disabled action buttons in Streamlit, always compute and pass a contextual `help` string to explicitly clarify the prerequisite for enabling the button.
