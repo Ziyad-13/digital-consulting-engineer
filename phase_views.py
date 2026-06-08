@@ -331,17 +331,24 @@ def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> Non
     st.subheader(f"📦 {t('mat.heading')}")
     st.caption(t("mat.subheading"))
 
+    # Bolt Optimization: Fetch DB state once outside the loop instead of N times.
+    # We load materials_state and construct a boq_dict for O(1) lookups to avoid N+1 query problem.
+    materials_state = db.get_materials(project_id, phase_number)
+    boq_dict = {item["item_name"]: item for item in db.get_boq_items(project_id)}
+
     for mat in pdef["materials"]:
-        _render_material_row(project_id, phase_number, mat)
+        _render_material_row(project_id, phase_number, mat, materials_state, boq_dict)
 
 
-def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
+def _render_material_row(project_id: int, phase_number: int, mat: dict, materials_state: dict, boq_dict: dict) -> None:
     name = t(mat["name_key"])
-    boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
+
+    # Bolt Optimization: O(1) dictionary lookup instead of db.get_boq_item_by_name
+    boq_row = boq_dict.get(mat["boq_match_name"])
     expected_qty = boq_row["quantity"] if boq_row else 0.0
     expected_unit = boq_row["unit"] if boq_row else ""
 
-    materials_state = db.get_materials(project_id, phase_number)
+    # Bolt Optimization: Read from passed dictionary instead of db.get_materials
     cur = materials_state.get(mat["key"], {})
 
     with st.container(border=True):
