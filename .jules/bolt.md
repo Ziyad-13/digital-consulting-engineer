@@ -1,0 +1,3 @@
+## 2024-05-18 - Streamlit Render Loop N+1 Queries
+**Learning:** Streamlit reruns the entire file or function on state changes, making it easy to accidentally bury N+1 queries inside render loops (like iterating over materials or checklist items).
+**Action:** Always extract state lookups and database queries to the top level of the component/page before iterating over configuration dictionaries or lists to render UI elements. Using a Python dictionary for O(1) lookups instead of querying the DB for each item dramatically reduces connection overhead.
