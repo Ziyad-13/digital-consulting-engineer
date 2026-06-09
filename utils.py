@@ -136,16 +136,20 @@ def inject_styles() -> None:
 # Sticky progress bar (rendered at the top of the main column)
 # ---------------------------------------------------------------------------
 def render_progress_bar(project_id: int, current_phase: int,
-                        phase_order: list[int]) -> None:
+                        phase_order: list[int],
+                        completed_phases: set[int] | None = None) -> None:
+    """Render the sticky progress bar. Accepts an optional completed_phases set
+    to prevent N+1 queries during render loops."""
     pills_html = []
     for p in phase_order:
-        done = db.is_phase_marked_complete(project_id, p)
+        # ⚡ Bolt: Use O(1) set lookup if provided, fallback to DB if not
+        done = p in completed_phases if completed_phases is not None else db.is_phase_marked_complete(project_id, p)
         cls = "done" if done else ("current" if p == current_phase else "locked")
         label = t(f"phase.{p}.short")
         pills_html.append(f'<div class="dce-pill {cls}">{label}</div>')
 
     completed = sum(1 for p in phase_order
-                    if db.is_phase_marked_complete(project_id, p))
+                    if (p in completed_phases if completed_phases is not None else db.is_phase_marked_complete(project_id, p)))
     label = t("hdr.progress")
     html = (
         f'<div class="dce-progress">'

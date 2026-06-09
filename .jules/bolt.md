@@ -1,0 +1,3 @@
+## 2025-10-15 - Streamlit N+1 Lookups
+**Learning:** In Streamlit applications, rendering lists or grids (like a progress bar across many phases) frequently triggers N+1 database queries if the helper functions check status item-by-item (`db.is_phase_marked_complete`). This is a huge bottleneck because every UI refresh hits the disk repeatedly.
+**Action:** When a UI component needs to query the database multiple times, fetch the required data in a single batch query at the top level, return a `set` or `dict` for O(1) lookups, and pass that collection down to avoid repetitive querying.
