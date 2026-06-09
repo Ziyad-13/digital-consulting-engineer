@@ -485,11 +485,19 @@ def _render_checklist_item(
         col_pass, col_fail, col_rework, col_save = st.columns(4)
 
         pass_disabled = material_blocked or image_blocked
+        pass_help = None
+        if pass_disabled:
+            if material_blocked:
+                pass_help = t("alert.material_required")
+            elif image_blocked:
+                pass_help = t("alert.image_required")
+
         if col_pass.button(
             t("btn.mark_pass"),
             key=f"pass_{phase_number}_{key}",
             disabled=pass_disabled,
             type="primary",
+            help=pass_help,
         ):
             db.upsert_checklist_item(
                 project_id, phase_number, key, status="PASS", notes=notes
@@ -509,6 +517,7 @@ def _render_checklist_item(
             t("btn.start_rework"),
             key=f"rework_{phase_number}_{key}",
             disabled=status not in ("FAIL", "REWORK"),
+            help=t("misc.disabled_rework") if status not in ("FAIL", "REWORK") else None,
         ):
             db.start_rework(project_id, phase_number, key)
             alert_info(t("alert.rework_in_progress",
