@@ -1,0 +1,3 @@
+## 2025-03-01 - Add Tooltips to Disabled Buttons
+**Learning:** In Streamlit, users often experience frustration when buttons are disabled without an explanation. Streamlit's `st.button` does not support standard `aria-label` directly but the `help` parameter can be repurposed as a tooltip to explain the disabled state (e.g., missing material delivery invoices or images required for passing), enhancing both accessibility and micro-UX.
+**Action:** Use `help` with conditional messaging on `st.button` when `disabled=True` to provide contextual feedback to users about what is blocking their action.
