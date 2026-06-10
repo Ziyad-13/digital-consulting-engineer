@@ -1,0 +1,3 @@
+## 2026-06-10 - [Batching N+1 Queries in Streamlit Layouts]
+**Learning:** In Streamlit applications, iterative UI generation patterns (like rendering navigation sidebars or progress bars using loops) that contain individual database queries (e.g. `db.is_phase_marked_complete()`) lead to N+1 query problems. Because Streamlit executes the entire script top-to-bottom on every render, these hidden N+1 queries compound rapidly and significantly degrade performance.
+**Action:** When generating layout components or lists based on database state, fetch the necessary data via a single batched query at the top of the component/file and convert it to an O(1) lookup structure (like a `set` or `dict`) to check against during the loop.
