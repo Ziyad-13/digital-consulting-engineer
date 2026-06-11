@@ -1,0 +1,3 @@
+## 2026-06-11 - Streamlit N+1 Render Loop Pattern
+**Learning:** Streamlit’s layout iteration frequently masks classic N+1 database querying issues. Because layout calls like `st.columns()` execute synchronously block by block, doing a database fetch per row significantly stalls rendering, especially with complex loops in views.
+**Action:** Always fetch needed data via batched queries (e.g., returning sets or dicts for O(1) lookups) at the top level of the rendering function before entering the loop to ensure snappy UI interaction without redundant blocking calls.
