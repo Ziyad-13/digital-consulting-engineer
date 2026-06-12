@@ -1,0 +1,3 @@
+## 2024-05-19 - Explain Disabled Button States
+**Learning:** `st.button` components in Streamlit don't accept standard `aria-label` tags for accessibility, and it can be confusing for users when buttons are disabled without context.
+**Action:** Utilize the native `help` parameter (`st.button(..., help='tooltip text')`) to provide context on why a button is currently disabled, improving accessibility and user experience.
