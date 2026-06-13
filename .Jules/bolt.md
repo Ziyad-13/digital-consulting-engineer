@@ -1,0 +1,3 @@
+## 2025-05-18 - Fix N+1 queries in Layout Components
+**Learning:** In Streamlit layout components (like progress bars) that iterate over collections, making individual database calls (N+1 query problem) within the render loop significantly slows down the frontend rendering.
+**Action:** When calculating derived state for UI components in loops, always pre-fetch the necessary state outside the loop using batched database queries returning O(1) lookup structures like sets or dicts.
