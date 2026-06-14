@@ -489,6 +489,7 @@ def _render_checklist_item(
             t("btn.mark_pass"),
             key=f"pass_{phase_number}_{key}",
             disabled=pass_disabled,
+            help=t("alert.material_required") if material_blocked else (t("alert.image_required") if image_blocked else None),
             type="primary",
         ):
             db.upsert_checklist_item(
@@ -509,6 +510,7 @@ def _render_checklist_item(
             t("btn.start_rework"),
             key=f"rework_{phase_number}_{key}",
             disabled=status not in ("FAIL", "REWORK"),
+            help=t("misc.disabled_rework") if status not in ("FAIL", "REWORK") else None,
         ):
             db.start_rework(project_id, phase_number, key)
             alert_info(t("alert.rework_in_progress",
