@@ -577,6 +577,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     # ----- Misc -----
     "misc.disabled_locked": {"en": "🔒 Locked (previous phase not approved)",
                              "ar": "🔒 مغلق (المرحلة السابقة لم تُعتمد بعد)"},
+    "misc.disabled_pass":   {"en": "Cannot pass without required materials and images.",
+                             "ar": "لا يمكن التجاوز بدون المواد والصور المطلوبة."},
+    "misc.disabled_rework": {"en": "Rework can only be started if the item is failed.",
+                             "ar": "لا يمكن بدء إعادة العمل إلا إذا فشل العنصر."},
     "misc.rework_count":    {"en": "Rework attempts: {n}",
                              "ar": "عدد محاولات إعادة العمل: {n}"},
     "misc.image_uploaded":  {"en": "Image uploaded.",
