@@ -1,0 +1,3 @@
+## 2024-05-24 - [N+1 loop optimizations in Streamlit layout rendering]
+**Learning:** Streamlit apps heavily run layout code. Relying on function calls that make direct SQL queries (like `is_phase_marked_complete`) within loops over static configuration structures (`PHASE_ORDER`) causes severe N+1 overhead blocking the main rendering thread. Also, using array iterations for format mapping in `st.selectbox` components can cause an O(N) complexity slowdown in UI responsiveness.
+**Action:** Always pre-fetch batched database queries into `set` or `dict` objects before loops and utilize O(1) dictionary maps for dropdown select items inside Streamlit applications.
