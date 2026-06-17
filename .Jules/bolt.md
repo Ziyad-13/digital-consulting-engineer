@@ -1,0 +1,3 @@
+## 2024-05-24 - O(N^2) scaling risk in Streamlit format_func
+**Learning:** Streamlit's `st.selectbox` executes the `format_func` internally for every single option item rendered to the frontend. If the `format_func` includes an O(N) array search (e.g., `next(item for item in array if condition)`), this creates a hidden O(N^2) performance bottleneck that will degrade responsiveness as the number of items grows.
+**Action:** When populating Streamlit `st.selectbox` components, avoid using array iterations inside the `format_func`. Pre-compute a dictionary mapping before the selectbox call to allow O(1) lookups and maintain O(N) rendering performance.

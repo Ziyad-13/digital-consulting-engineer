@@ -65,12 +65,13 @@ with st.sidebar:
     # ---- Project picker --------------------------------------------------
     projects = db.list_projects()
     if projects:
+        # ⚡ Bolt Optimization: Pre-compute dictionary for O(1) selectbox label lookup.
+        # Streamlit calls format_func on every item, turning O(N) array iteration into an O(N^2) bottleneck.
+        project_names = {p["id"]: p["name"] for p in projects}
         selected_id = st.selectbox(
             t("nav.active_project"),
             options=[p["id"] for p in projects],
-            format_func=lambda pid: next(
-                p["name"] for p in projects if p["id"] == pid
-            ),
+            format_func=lambda pid: project_names.get(pid, str(pid)),
             key="active_project_id",
         )
     else:
