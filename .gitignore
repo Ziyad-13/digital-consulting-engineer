@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+construction_app_v2.db
+uploads/
