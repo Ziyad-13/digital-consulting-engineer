@@ -485,11 +485,18 @@ def _render_checklist_item(
         col_pass, col_fail, col_rework, col_save = st.columns(4)
 
         pass_disabled = material_blocked or image_blocked
+        pass_help = None
+        if material_blocked:
+            pass_help = t("misc.disabled_material")
+        elif image_blocked:
+            pass_help = t("misc.disabled_image")
+
         if col_pass.button(
             t("btn.mark_pass"),
             key=f"pass_{phase_number}_{key}",
             disabled=pass_disabled,
             type="primary",
+            help=pass_help,
         ):
             db.upsert_checklist_item(
                 project_id, phase_number, key, status="PASS", notes=notes
@@ -505,10 +512,12 @@ def _render_checklist_item(
             st.rerun()
 
         # Rework button only matters once the item is in FAIL state
+        rework_disabled = status not in ("FAIL", "REWORK")
         if col_rework.button(
             t("btn.start_rework"),
             key=f"rework_{phase_number}_{key}",
-            disabled=status not in ("FAIL", "REWORK"),
+            disabled=rework_disabled,
+            help=t("misc.disabled_rework") if rework_disabled else None,
         ):
             db.start_rework(project_id, phase_number, key)
             alert_info(t("alert.rework_in_progress",
