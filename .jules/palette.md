@@ -1,0 +1,3 @@
+## 2026-06-19 - Tooltips on disabled components clarify complex gating logic
+**Learning:** In applications with multi-condition state (e.g. needing an image AND matching material delivery before a phase passes), users are often confused when a primary action button is disabled without explanation. Native framework tooltips (like Streamlit's `help` parameter on `st.button`) provide an accessible, low-friction way to expose the required pre-conditions.
+**Action:** Always provide context for disabled interactive elements. If a user cannot perform an action, tell them exactly what is missing (e.g., "An image is required", "Material mismatch", "Only failed items can be reworked").
