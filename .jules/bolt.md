@@ -1,0 +1,3 @@
+## 2025-03-01 - Optimize N+1 DB queries in Streamlit render loops
+**Learning:** Streamlit render loops that call a database query per item (e.g. checking if a phase is complete in `app.py` or `utils.py`) create significant N+1 query bottlenecks and hurt responsiveness since they run on every rerender. Even small collections like 6-7 phases can cause ~14 queries per render cycle.
+**Action:** When evaluating states across an iteration (like rendering lock icons or pills in a progress bar), always fetch the completed states in a single batch query at the top of the component and store them in a Python `set` for O(1) lookup during the loop.

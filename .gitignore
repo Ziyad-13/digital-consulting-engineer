@@ -1,0 +1,8 @@
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary DB
+construction_app_v2.db

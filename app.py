@@ -98,11 +98,13 @@ with st.sidebar:
     # ---- Phase navigation (with lock icons) ------------------------------
     if selected_id is not None:
         st.subheader(t("nav.phases"))
+        # ⚡ Bolt: Fetch all completed phases in O(1) batch query to prevent N+1 in loop
+        completed_phases = db.get_completed_phases(selected_id)
         radio_labels: dict[int, str] = {}
         for pn in PHASE_ORDER:
-            done = db.is_phase_marked_complete(selected_id, pn)
+            done = pn in completed_phases
             prev = previous_phase(pn)
-            prereq_done = prev is None or db.is_phase_marked_complete(selected_id, prev)
+            prereq_done = prev is None or prev in completed_phases
             icon = "✅" if done else ("🔧" if prereq_done else "🔒")
             radio_labels[pn] = f"{icon}  {_phase_label(pn)}"
         st.radio(
