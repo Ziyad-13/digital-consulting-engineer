@@ -1,0 +1,3 @@
+## 2024-06-21 - Added tooltips to disabled Streamlit buttons
+**Learning:** In Streamlit, users often experience confusion when interaction elements (like `st.button`) are disabled but no explicit explanation is provided. While traditional HTML requires complex ARIA attributes, Streamlit's native `help` parameter serves as a built-in mechanism to render a descriptive tooltip explaining the specific state (e.g., missing material proof vs. image proof).
+**Action:** When conditionally disabling interactive elements in Streamlit, always utilize the native `help` parameter to provide immediate, context-aware feedback explaining why the action is restricted.
