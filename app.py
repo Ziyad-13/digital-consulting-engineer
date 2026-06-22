@@ -65,12 +65,11 @@ with st.sidebar:
     # ---- Project picker --------------------------------------------------
     projects = db.list_projects()
     if projects:
+        project_names = {p["id"]: p["name"] for p in projects}
         selected_id = st.selectbox(
             t("nav.active_project"),
             options=[p["id"] for p in projects],
-            format_func=lambda pid: next(
-                p["name"] for p in projects if p["id"] == pid
-            ),
+            format_func=lambda pid: project_names[pid],
             key="active_project_id",
         )
     else:
