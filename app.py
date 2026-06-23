@@ -65,12 +65,13 @@ with st.sidebar:
     # ---- Project picker --------------------------------------------------
     projects = db.list_projects()
     if projects:
+        # ⚡ Bolt: Pre-compute dictionary mapping for O(1) selectbox lookups.
+        # Avoids an O(N) array iteration per selectbox option during render.
+        project_names = {p["id"]: p["name"] for p in projects}
         selected_id = st.selectbox(
             t("nav.active_project"),
-            options=[p["id"] for p in projects],
-            format_func=lambda pid: next(
-                p["name"] for p in projects if p["id"] == pid
-            ),
+            options=list(project_names.keys()),
+            format_func=project_names.get,
             key="active_project_id",
         )
     else:
@@ -143,9 +144,7 @@ with st.sidebar:
         # child table.
         st.markdown("---")
         with st.expander(t("nav.delete_project")):
-            project_name = next(
-                (p["name"] for p in projects if p["id"] == selected_id), ""
-            )
+            project_name = project_names.get(selected_id, "")
             st.caption(t("nav.delete_warning"))
             typed = st.text_input(
                 t("nav.confirm_delete"),

@@ -1,0 +1,3 @@
+## 2026-06-23 - Optimize Selectbox Rendering
+**Learning:** In Streamlit, using an array iteration with `next(...)` inside a `st.selectbox`'s `format_func` creates an O(N^2) complexity problem during render because `format_func` is called for every single option.
+**Action:** Always pre-compute a dictionary mapping before the selectbox to provide an O(1) lookup method (like `dict.get`) for the `format_func`.
