@@ -1,0 +1,3 @@
+## 2025-01-20 - Streamlit selectbox format_func O(N^2) Bottleneck
+**Learning:** Streamlit calls the `format_func` of `st.selectbox` for *every* single option in the list during rendering. Using an O(N) list comprehension or generator inside the `format_func` (like `next(p["name"] for p in projects if p["id"] == pid)`) effectively creates a hidden O(N^2) render loop, which becomes a severe bottleneck as the dataset grows.
+**Action:** When populating Streamlit `st.selectbox` components from a list of dictionaries or database rows, always pre-compute a dictionary mapping (e.g., `project_names = {p["id"]: p["name"] for p in projects}`) for O(1) lookups inside the `format_func`.
