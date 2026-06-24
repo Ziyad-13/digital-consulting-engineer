@@ -1,0 +1,3 @@
+## 2025-06-24 - [Add tooltips to disabled Streamlit buttons]
+**Learning:** Streamlit's `st.button` components do not natively support full ARIA labels, making it difficult for users (especially those relying on screen readers) to understand why a button is disabled. However, passing a `help` string automatically adds a tooltip and makes the disabled state reason discoverable.
+**Action:** When creating a disabled `st.button` that relies on multiple conditions (like missing materials or images), compute a multi-line `help` string aggregating all reasons it's disabled, improving the UX and accessibility without needing complex custom HTML.
