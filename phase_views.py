@@ -485,10 +485,20 @@ def _render_checklist_item(
         col_pass, col_fail, col_rework, col_save = st.columns(4)
 
         pass_disabled = material_blocked or image_blocked
+        pass_help = None
+        if pass_disabled:
+            reasons = []
+            if material_blocked:
+                reasons.append(t("alert.material_required"))
+            if image_blocked:
+                reasons.append(t("alert.image_required"))
+            pass_help = "\n\n".join(reasons)
+
         if col_pass.button(
             t("btn.mark_pass"),
             key=f"pass_{phase_number}_{key}",
             disabled=pass_disabled,
+            help=pass_help,
             type="primary",
         ):
             db.upsert_checklist_item(
