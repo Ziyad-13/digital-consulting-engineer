@@ -123,11 +123,12 @@ _BASE_CSS = """
 
 _RTL_CSS = """
 <style>
-[data-testid="stAppViewContainer"], [data-testid="stSidebar"],
-[data-testid="stHeader"], [data-testid="stMainBlockContainer"] {
+[data-testid="stMarkdownContainer"] *, [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
+.stTextInput, .stSelectbox, .stButton, .stProgress, label, .dce-pill, .dce-progress-label {
     direction: rtl;
+    text-align: right;
 }
-input[type="number"], code, pre { direction: ltr; }
+input[type="number"], code, pre { direction: ltr; text-align: left; }
 </style>
 """
 
