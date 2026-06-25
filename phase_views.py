@@ -542,8 +542,7 @@ def _render_phase_signoff(project_id: int, phase_number: int, pdef: dict) -> Non
                 pending.append(f"📦 {t(item['label_key'])}")
 
     if db.is_phase_marked_complete(project_id, phase_number):
-        certs = [c for c in db.get_payment_certificates(project_id)
-                 if c["phase_number"] == phase_number]
+        certs = db.get_payment_certificates(project_id, phase_number=phase_number)
         if certs:
             cert = certs[-1]
             alert_success(
