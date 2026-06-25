@@ -284,16 +284,6 @@ def run_material_match(
 
 
 # ============================ Vision AI ====================================
-def detect_steel_compliance(image_path: str, expected_bars: int = 12) -> dict:
-    detected = expected_bars + random.choice([-2, -1, 0, 0, 0, 1])
-    return {
-        "detected_bars": detected,
-        "expected_bars": expected_bars,
-        "match": detected == expected_bars,
-        "confidence": round(random.uniform(0.78, 0.95), 2),
-    }
-
-
 def detect_image_defects(image_path: str) -> list[str]:
     return []  # MVP: never reports defects unless wired to a real model
 
