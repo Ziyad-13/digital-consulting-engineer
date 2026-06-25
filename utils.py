@@ -112,6 +112,12 @@ _BASE_CSS = """
 .dce-pill.current { background: #f59e0b; }
 .dce-pill.locked  { background: #94a3b8; }
 .dce-progress-label { font-size: 0.85rem; color: #475569; margin-bottom: 4px; }
+
+@media (max-width: 768px) {
+    [data-testid="stMainBlockContainer"] { padding: 1rem; }
+    [data-testid="stMetricValue"] { font-size: 1.2rem; }
+    .dce-pill { padding: 4px 8px; font-size: 0.8rem; min-width: 32px; }
+}
 </style>
 """
 
