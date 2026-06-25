@@ -7,7 +7,6 @@ by phase. Run with::
     pip install -r requirements.txt
     streamlit run app.py
 """
-from __future__ import annotations
 
 import streamlit as st
 
