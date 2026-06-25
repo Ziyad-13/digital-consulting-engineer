@@ -509,6 +509,7 @@ def _render_checklist_item(
             t("btn.start_rework"),
             key=f"rework_{phase_number}_{key}",
             disabled=status not in ("FAIL", "REWORK"),
+            help=t("misc.disabled_rework") if status not in ("FAIL", "REWORK") else None,
         ):
             db.start_rework(project_id, phase_number, key)
             alert_info(t("alert.rework_in_progress",
