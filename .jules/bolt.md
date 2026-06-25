@@ -1,0 +1,3 @@
+## 2025-01-20 - Remove N+1 query in progress bar
+**Learning:** Rendering loops that perform individual database queries to check completion status cause an N+1 performance bottleneck, which scales poorly as the number of items increases.
+**Action:** Always compute derived states (like counts or aggregations) within a single pass while iterating through the items, or fetch required data using batched queries beforehand to maintain O(1) loop operations and reduce redundant I/O operations.

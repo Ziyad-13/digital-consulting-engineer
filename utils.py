@@ -138,14 +138,17 @@ def inject_styles() -> None:
 def render_progress_bar(project_id: int, current_phase: int,
                         phase_order: list[int]) -> None:
     pills_html = []
+    # Optimization: Calculate 'completed' in the first loop to remove N redundant DB queries
+    # Expected impact: Faster rendering of progress bar, O(N) -> O(1) loop logic on completed
+    completed = 0
     for p in phase_order:
         done = db.is_phase_marked_complete(project_id, p)
+        if done:
+            completed += 1
         cls = "done" if done else ("current" if p == current_phase else "locked")
         label = t(f"phase.{p}.short")
         pills_html.append(f'<div class="dce-pill {cls}">{label}</div>')
 
-    completed = sum(1 for p in phase_order
-                    if db.is_phase_marked_complete(project_id, p))
     label = t("hdr.progress")
     html = (
         f'<div class="dce-progress">'
