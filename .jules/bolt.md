@@ -1,0 +1,3 @@
+## 2025-02-28 - [O(N^2) Scaling in Streamlit Selectbox Format Functions]
+**Learning:** [Streamlit's `st.selectbox` evaluates its `format_func` for every option every time the component renders. If the `format_func` contains an O(N) lookup (like `next(p["name"] for p in projects if p["id"] == pid)`), it causes the component render time to scale O(N^2). This is a critical pattern in Streamlit apps where data collections grow.]
+**Action:** [Pre-compute a dictionary mapping (O(1) lookup) outside the `format_func` instead of doing array iterations (O(N)) inside it when formatting collections in Streamlit selectboxes.]
