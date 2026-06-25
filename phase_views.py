@@ -9,8 +9,6 @@ Per-phase Streamlit view renderers (v2).
 * render_phase_stub       : Placeholder shown for phases 2–6 (which will be
                             filled in after sign-off from the product owner).
 """
-from __future__ import annotations
-
 import os
 
 import streamlit as st
