@@ -1,0 +1,3 @@
+## 2025-05-15 - Push Filtering to the Database
+**Learning:** Python list comprehensions over large datasets fetched from the database can be inefficient (O(N)). Filtering directly within the SQL query (e.g., adding `AND phase_number=?`) pushes this work to the database level, resulting in O(1) performance impact on the application side.
+**Action:** When filtering dataset results by specific criteria (like IDs or phase numbers), always pass the criteria directly into the SQL query rather than fetching everything and filtering on the client side.

@@ -588,13 +588,25 @@ def save_payment_certificate(
         )
 
 
-def get_payment_certificates(project_id: int) -> list[dict]:
+def get_payment_certificates(project_id: int, phase_number: int | None = None) -> list[dict]:
+    """
+    ⚡ Bolt Optimization: Filter payment certificates by phase_number directly in the database query.
+    Expected performance impact: Significant reduction in Python-side allocations and iterations (from O(N) down to O(1) filtering at DB level)
+    by only returning the relevant certificates for the phase.
+    """
     with get_conn() as conn:
-        return [dict(r) for r in conn.execute(
-            "SELECT * FROM payment_certificates WHERE project_id=? "
-            "ORDER BY phase_number, issued_at",
-            (project_id,),
-        ).fetchall()]
+        if phase_number is not None:
+            return [dict(r) for r in conn.execute(
+                "SELECT * FROM payment_certificates WHERE project_id=? AND phase_number=? "
+                "ORDER BY phase_number, issued_at",
+                (project_id, phase_number),
+            ).fetchall()]
+        else:
+            return [dict(r) for r in conn.execute(
+                "SELECT * FROM payment_certificates WHERE project_id=? "
+                "ORDER BY phase_number, issued_at",
+                (project_id,),
+            ).fetchall()]
 
 
 # ============================ Timers =======================================
