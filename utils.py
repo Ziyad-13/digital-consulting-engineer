@@ -60,7 +60,9 @@ def save_uploaded_file(uploaded_file, project_id: int, phase: int,
         return None
     folder = ensure_upload_dir(project_id, phase, subfolder)
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    safe_name = uploaded_file.name.replace(" ", "_")
+    # Sanitize the file name to prevent directory traversal
+    base_name = os.path.basename(uploaded_file.name.replace("\\", "/"))
+    safe_name = base_name.replace(" ", "_")
     file_path = os.path.join(folder, f"{timestamp}_{safe_name}")
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
