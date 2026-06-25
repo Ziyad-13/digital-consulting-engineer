@@ -18,8 +18,6 @@ Suggested production stack:
 * get_local_weather    → real call to a Saudi weather provider; the
                          hot/humid flag drives SBC curing advice and
                          the recommendation to use SRC concrete.
-* query_saudi_building_code → Vector DB (Qdrant/Pinecone) of official SBC
-                         PDFs answered with RAG.
 """
 from __future__ import annotations
 
@@ -322,7 +320,3 @@ def get_local_weather(location: str | None) -> dict[str, Any]:
     }
 
 
-# ============================ RAG over SBC =================================
-def query_saudi_building_code(question: str) -> str:
-    return ("[Placeholder] In production this returns a cited answer "
-            "from the Saudi Building Code knowledge base.")
