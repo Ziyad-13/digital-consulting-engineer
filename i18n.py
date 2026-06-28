@@ -575,6 +575,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                       "ar": "تعتمد هذه الشهادة صرف دفعة المرحلة للمقاول."},
 
     # ----- Misc -----
+    "misc.disabled_pass":   {"en": "Cannot pass until required material is checked and image is uploaded",
+                             "ar": "لا يمكن التمرير حتى يتم التحقق من المواد المطلوبة ورفع الصورة"},
+    "misc.disabled_rework": {"en": "Rework can only be started if the item is marked as FAIL or already in REWORK",
+                             "ar": "لا يمكن بدء إعادة العمل إلا إذا كان العنصر مميزاً كفشل أو قيد إعادة العمل مسبقاً"},
     "misc.disabled_locked": {"en": "🔒 Locked (previous phase not approved)",
                              "ar": "🔒 مغلق (المرحلة السابقة لم تُعتمد بعد)"},
     "misc.rework_count":    {"en": "Rework attempts: {n}",

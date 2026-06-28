@@ -1,0 +1,3 @@
+## 2024-03-24 - Streamlit Disabled Button Tooltips
+**Learning:** Streamlit's `st.button` doesn't natively support setting `aria-label` tags, making disabled buttons difficult to understand for screen readers and regular users. Using the native `help` parameter (`st.button(..., help='tooltip text')`) provides context on why the button is disabled and acts as a tooltip.
+**Action:** Use the `help` parameter in `st.button` for disabled states to improve accessibility and provide helpful context to users.
