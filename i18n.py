@@ -581,6 +581,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                              "ar": "عدد محاولات إعادة العمل: {n}"},
     "misc.image_uploaded":  {"en": "Image uploaded.",
                              "ar": "تم رفع الصورة."},
+    "misc.disabled_rework": {"en": "Item must be marked FAIL before rework can start.",
+                             "ar": "يجب وضع علامة FAIL على البند قبل بدء إعادة العمل."},
 }
 
 
