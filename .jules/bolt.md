@@ -1,0 +1,3 @@
+## 2025-02-28 - Optimize Material Delivery Gate performance
+**Learning:** N+1 query patterns in Streamlit loop rendering components (like fetching BOQ and material state per item) significantly degrade responsiveness.
+**Action:** Pre-fetch and index all necessary data into dictionaries (O(1) lookups) at the container level (`_render_material_gate`) and pass them down as props to the child row renderers (`_render_material_row`).
