@@ -15,7 +15,6 @@ Schema changes vs v1:
 * New `siteprep_photos` table for Phase-0 fencing & municipality board
   proofs.
 """
-from __future__ import annotations
 
 import sqlite3
 from contextlib import contextmanager
