@@ -1,0 +1,3 @@
+## 2026-06-30 - Optimize material row rendering by fixing N+1 query
+**Learning:** In Streamlit render loops, executing database queries inside the loop (N+1 query problem) significantly slows down rendering, especially for iterative UI elements like rows of data.
+**Action:** When rendering loops of UI elements that require database data, always batch fetch the required data outside the loop and map it to a dictionary for O(1) lookups during rendering to optimize execution time.
