@@ -331,17 +331,27 @@ def _render_material_gate(project_id: int, phase_number: int, pdef: dict) -> Non
     st.subheader(f"📦 {t('mat.heading')}")
     st.caption(t("mat.subheading"))
 
+    boq_items = db.get_boq_items(project_id)
+    boq_dict = {item["item_name"]: item for item in boq_items}
+    materials_state = db.get_materials(project_id, phase_number)
+
     for mat in pdef["materials"]:
-        _render_material_row(project_id, phase_number, mat)
+        _render_material_row(project_id, phase_number, mat, boq_dict=boq_dict, materials_state=materials_state)
 
 
-def _render_material_row(project_id: int, phase_number: int, mat: dict) -> None:
+def _render_material_row(project_id: int, phase_number: int, mat: dict, boq_dict: dict | None = None, materials_state: dict | None = None) -> None:
     name = t(mat["name_key"])
-    boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
+
+    if boq_dict is not None:
+        boq_row = boq_dict.get(mat["boq_match_name"])
+    else:
+        boq_row = db.get_boq_item_by_name(project_id, mat["boq_match_name"])
+
     expected_qty = boq_row["quantity"] if boq_row else 0.0
     expected_unit = boq_row["unit"] if boq_row else ""
 
-    materials_state = db.get_materials(project_id, phase_number)
+    if materials_state is None:
+        materials_state = db.get_materials(project_id, phase_number)
     cur = materials_state.get(mat["key"], {})
 
     with st.container(border=True):
