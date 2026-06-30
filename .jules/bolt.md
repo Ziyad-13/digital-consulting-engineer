@@ -1,0 +1,3 @@
+## 2026-06-30 - Optimize Streamlit rendering loop N+1 query
+**Learning:** In Streamlit layouts, repetitive database queries inside iteration loops (like `_render_material_row` inside `_render_material_gate`) significantly impact performance, presenting as slow UI response due to repeated connections or I/O.
+**Action:** When populating dynamic UI components, batch fetch the necessary data (`boq_items` and `materials_state`) beforehand, index them into O(1) dictionary lookups, and pass them as optional arguments. Always provide a fallback to maintain backward compatibility.
