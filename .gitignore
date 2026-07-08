@@ -1,0 +1,4 @@
+.jules/
+__pycache__/
+.pytest_cache/
+construction_app_v2.db
