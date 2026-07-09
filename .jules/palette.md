@@ -1,0 +1,3 @@
+## 2026-07-09 - Streamlit Disabled Button Tooltips
+**Learning:** In Streamlit, `st.button` components do not easily accept standard `aria-label` tags, and disabled buttons provide poor UX without context. Using the native `help` parameter (`st.button(..., help='reason')`) is an effective and accessible way to communicate why a button is disabled to the user.
+**Action:** Always utilize the `help` parameter for disabled buttons in Streamlit to explain the blocked state, improving both accessibility and general user experience.
