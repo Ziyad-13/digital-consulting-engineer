@@ -129,6 +129,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
                      "ar": "المرحلة {phase} مغلقة. اعتمد المرحلة {prev} أولًا."},
     "alert.image_required":   {"en": "An image is required to PASS this item.",
                                "ar": "يلزم رفع صورة لاعتماد هذا البند."},
+    "misc.disabled_rework":   {"en": "Only available for items marked as FAIL.",
+                               "ar": "متاح فقط للبنود المسجلة كفشل."},
     "alert.material_required":{"en": "Material delivery must MATCH the BOQ before this item can PASS.",
                                "ar": "يجب أن تطابق فاتورة التوريد جدول الكميات قبل اعتماد هذا البند."},
     "alert.fail_explain":     {"en": "This item failed. After fixing on site, click Re-submit to start the rework cycle.",
