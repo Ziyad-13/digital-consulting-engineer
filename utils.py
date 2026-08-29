@@ -112,16 +112,23 @@ _BASE_CSS = """
 .dce-pill.current { background: #f59e0b; }
 .dce-pill.locked  { background: #94a3b8; }
 .dce-progress-label { font-size: 0.85rem; color: #475569; margin-bottom: 4px; }
+
+@media (max-width: 768px) {
+    [data-testid="stMainBlockContainer"] { padding: 1rem; }
+    [data-testid="stMetricValue"] { font-size: 1.2rem; }
+    .dce-pill { padding: 4px 8px; font-size: 0.8rem; min-width: 32px; }
+}
 </style>
 """
 
 _RTL_CSS = """
 <style>
-[data-testid="stAppViewContainer"], [data-testid="stSidebar"],
-[data-testid="stHeader"], [data-testid="stMainBlockContainer"] {
+[data-testid="stMarkdownContainer"] *, [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
+.stTextInput, .stSelectbox, .stButton, .stProgress, label, .dce-pill, .dce-progress-label {
     direction: rtl;
+    text-align: right;
 }
-input[type="number"], code, pre { direction: ltr; }
+input[type="number"], code, pre { direction: ltr; text-align: left; }
 </style>
 """
 
